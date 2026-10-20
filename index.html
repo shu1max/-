@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>源肺悉踪 · 全国首个多组学肺纤动态监测系统</title>
+<style>
+:root{
+  --deep:#173A7A; --deeper:#102B5C; --primary:#2858C4; --light:#E8F0FB;
+  --teal:#2FA8A0; --orange:#EE822F; --red:#D64545; --ink:#333333;
+  --gray:#595959; --ph:#999999; --bg:#F5F7FA; --line:#E5E9F2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:"Microsoft YaHei","PingFang SC","Segoe UI",sans-serif;color:var(--ink);background:#fff;font-size:15px;line-height:1.7;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+.container{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ============ 导航 ============ */
+#nav{position:fixed;top:0;left:0;right:0;z-index:200;transition:all .35s;padding:18px 0}
+#nav.scrolled{background:rgba(16,43,92,.92);backdrop-filter:blur(10px);padding:10px 0;box-shadow:0 4px 24px rgba(10,25,60,.35)}
+.nav-inner{max-width:1180px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px}
+.nav-logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:19px;letter-spacing:2px}
+.nav-logo .lg{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#2858C4,#2FA8A0);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700}
+.nav-links{margin-left:auto;display:flex;align-items:center;gap:26px}
+.nav-links a{color:#C9D8F2;font-size:14.5px;position:relative;padding:4px 2px;transition:color .25s}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-2px;width:0;height:2px;background:var(--teal);transition:width .3s}
+.nav-links a:hover{color:#fff}
+.nav-links a:hover::after{width:100%}
+.nav-btn{background:linear-gradient(135deg,#2858C4,#2FA8A0);color:#fff;border:none;border-radius:22px;padding:8px 22px;font-size:14px;font-weight:600;letter-spacing:1px;transition:transform .25s,box-shadow .25s}
+.nav-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(47,168,160,.4)}
+
+/* ============ Hero ============ */
+#hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;
+  background:radial-gradient(1200px 700px at 12% 8%,rgba(47,168,160,.28),transparent 55%),
+             radial-gradient(1100px 800px at 88% 92%,rgba(40,88,196,.4),transparent 55%),
+             linear-gradient(150deg,#173A7A 0%,#102B5C 60%,#0C2148 100%)}
+#particles{position:absolute;inset:0;width:100%;height:100%}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 70% 60% at 50% 45%,#000 30%,transparent 75%)}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:float 12s ease-in-out infinite}
+.blob.b1{width:420px;height:420px;background:rgba(40,88,196,.55);top:-120px;right:-80px}
+.blob.b2{width:360px;height:360px;background:rgba(47,168,160,.4);bottom:-100px;left:-90px;animation-delay:-6s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-36px)}}
+.hero-inner{position:relative;z-index:5;padding:0 24px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;color:#BFD6F5;font-size:14px;letter-spacing:3px;border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:6px 20px;margin-bottom:30px;background:rgba(255,255,255,.06)}
+.hero-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(47,168,160,.7)}70%{box-shadow:0 0 0 12px rgba(47,168,160,0)}100%{box-shadow:0 0 0 0 rgba(47,168,160,0)}}
+.hero-title{color:#fff;font-size:clamp(56px,9vw,92px);font-weight:700;letter-spacing:10px;line-height:1.15;text-shadow:0 6px 40px rgba(0,0,0,.35)}
+.hero-sub{color:#fff;font-size:clamp(21px,3.2vw,32px);font-weight:600;letter-spacing:4px;margin-top:18px;text-shadow:0 3px 20px rgba(0,0,0,.3)}
+.hero-sub .hl{color:#7FE3DC}
+.hero-tag{color:#C9D8F2;font-size:15.5px;letter-spacing:2px;margin-top:22px}
+.hero-tag b{color:#FFC58A;font-weight:600}
+.hero-btns{margin-top:40px;display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.hero-btn{border:none;border-radius:26px;padding:13px 34px;font-size:15.5px;font-weight:600;letter-spacing:2px;transition:all .3s}
+.hero-btn.main{background:linear-gradient(135deg,#2858C4,#2FA8A0);color:#fff;box-shadow:0 10px 30px rgba(40,88,196,.45)}
+.hero-btn.main:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(47,168,160,.5)}
+.hero-btn.ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.4)}
+.hero-btn.ghost:hover{background:rgba(255,255,255,.16);transform:translateY(-3px)}
+.hero-btn.patient{background:#fff;color:var(--deep);box-shadow:0 10px 30px rgba(255,255,255,.25)}
+.hero-btn.patient:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(255,255,255,.4)}
+
+/* ============ 双入口 ============ */
+.entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;max-width:920px;margin:0 auto}
+.entry-card{background:#fff;border:2px solid var(--line);border-radius:20px;padding:46px 40px;text-align:center;display:block;position:relative;overflow:hidden;transition:all .35s}
+.entry-card::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(40,88,196,.07),rgba(47,168,160,.07));opacity:0;transition:opacity .35s}
+.entry-card:hover{transform:translateY(-10px);box-shadow:0 24px 50px rgba(23,58,122,.2);border-color:var(--primary)}
+.entry-card:hover::after{opacity:1}
+.entry-card.pat:hover{border-color:var(--teal)}
+.entry-ico{font-size:54px;margin-bottom:14px;position:relative;z-index:1}
+.entry-card h3{font-size:27px;font-weight:700;color:var(--deep);letter-spacing:4px;position:relative;z-index:1}
+.entry-card p{font-size:14.5px;color:var(--gray);margin-top:10px;position:relative;z-index:1;line-height:1.9}
+.entry-go{display:inline-block;margin-top:22px;font-size:15px;font-weight:700;color:var(--primary);letter-spacing:2px;position:relative;z-index:1;transition:transform .3s}
+.entry-card.pat .entry-go{color:var(--teal)}
+.entry-card:hover .entry-go{transform:translateX(6px)}
+.hero-scroll{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:5;color:#8FA8D8;font-size:12.5px;letter-spacing:2px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.mouse{width:24px;height:38px;border:2px solid #8FA8D8;border-radius:14px;position:relative}
+.mouse::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:#7FE3DC;animation:wheel 1.8s infinite}
+@keyframes wheel{0%{transform:translateY(0);opacity:1}70%{transform:translateY(12px);opacity:0}100%{transform:translateY(0);opacity:0}}
+
+/* ============ 通用章节 ============ */
+section{padding:92px 0}
+.sec-alt{background:var(--bg)}
+.sec-head{text-align:center;margin-bottom:54px}
+.sec-head .kicker{color:var(--teal);font-size:13.5px;font-weight:700;letter-spacing:5px}
+.sec-head h2{font-size:34px;font-weight:700;color:var(--deep);margin-top:10px;letter-spacing:2px}
+.sec-head .desc{color:var(--gray);font-size:15px;margin-top:12px}
+.sec-line{width:56px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--primary),var(--teal));margin:18px auto 0}
+
+/* ============ 数据概览条 ============ */
+#stats{background:linear-gradient(135deg,#173A7A,#2858C4);padding:0}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-item{padding:44px 20px;text-align:center;color:#fff;border-right:1px solid rgba(255,255,255,.12)}
+.stat-item:last-child{border-right:none}
+.stat-item .num{font-size:40px;font-weight:700;letter-spacing:1px}
+.stat-item .num i{font-style:normal;font-size:22px;color:#7FE3DC}
+.stat-item .lbl{font-size:13.5px;color:#C9D8F2;margin-top:8px;letter-spacing:1px}
+
+/* ============ 三种数据（选项卡） ============ */
+.tabs{display:flex;justify-content:center;gap:14px;margin-bottom:46px;flex-wrap:wrap}
+.tab{background:#fff;border:1px solid var(--line);border-radius:26px;padding:12px 30px;font-size:16px;font-weight:600;color:var(--gray);letter-spacing:3px;transition:all .3s;display:flex;align-items:center;gap:10px}
+.tab .tico{font-size:18px}
+.tab:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-2px)}
+.tab.active{background:linear-gradient(135deg,#173A7A,#2858C4);color:#fff;border-color:transparent;box-shadow:0 10px 26px rgba(23,58,122,.35)}
+.panel{display:none;animation:fadein .5s}
+.panel.show{display:grid}
+@keyframes fadein{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center}
+.panel-visual{background:linear-gradient(160deg,var(--light),#DCE8F8);border-radius:18px;padding:38px 34px;min-height:340px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.panel-visual::after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(40,88,196,.14),transparent 70%)}
+.pv-ico{width:66px;height:66px;border-radius:16px;background:linear-gradient(135deg,#2858C4,#2FA8A0);color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 10px 24px rgba(40,88,196,.35)}
+.pv-title{font-size:24px;font-weight:700;color:var(--deep);letter-spacing:2px}
+.pv-sub{font-size:13.5px;color:var(--gray);margin-top:8px}
+.pv-flow{margin-top:24px;display:flex;flex-direction:column;gap:12px}
+.pv-step{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--ink);background:#fff;border-radius:10px;padding:11px 16px;box-shadow:0 2px 10px rgba(23,58,122,.07);transition:transform .3s,box-shadow .3s}
+.pv-step:hover{transform:translateX(6px);box-shadow:0 6px 18px rgba(23,58,122,.14)}
+.pv-step .sn{width:26px;height:26px;flex:none;border-radius:50%;background:var(--light);color:var(--primary);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.pv-step b{color:var(--deep)}
+.panel-info h3{font-size:26px;font-weight:700;color:var(--deep);letter-spacing:2px}
+.panel-info .ptag{display:inline-block;margin-top:10px;font-size:12.5px;color:var(--teal);border:1px solid rgba(47,168,160,.5);background:rgba(47,168,160,.08);border-radius:12px;padding:3px 12px;letter-spacing:1px}
+.panel-info p{color:var(--gray);font-size:14.5px;margin-top:16px}
+.panel-points{margin-top:22px;display:flex;flex-direction:column;gap:14px}
+.pp{display:flex;gap:12px;align-items:flex-start;border-left:3px solid var(--light);padding-left:14px;transition:border-color .3s}
+.pp:hover{border-color:var(--teal)}
+.pp b{color:var(--deep);display:block;font-size:14.5px}
+.pp span{color:var(--gray);font-size:13.5px}
+.mini-stats{margin-top:26px;display:flex;gap:14px;flex-wrap:wrap}
+.mini-stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 20px;min-width:130px;text-align:center;transition:all .3s}
+.mini-stat:hover{transform:translateY(-4px);box-shadow:0 10px 22px rgba(23,58,122,.12);border-color:var(--primary)}
+.mini-stat .v{font-size:24px;font-weight:700;color:var(--primary)}
+.mini-stat .k{font-size:12px;color:var(--gray);margin-top:2px}
+
+/* ============ 核心技术 ============ */
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.tech-card{background:#fff;border-radius:16px;padding:30px 26px;border:1px solid var(--line);position:relative;overflow:hidden;transition:all .35s}
+.tech-card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(23,58,122,.16);border-color:var(--primary)}
+.tech-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--primary),var(--teal));transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.tech-card:hover::before{transform:scaleX(1)}
+.tech-ico{width:54px;height:54px;border-radius:14px;background:var(--light);color:var(--primary);font-size:25px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;transition:all .35s}
+.tech-card:hover .tech-ico{background:linear-gradient(135deg,#2858C4,#2FA8A0);color:#fff}
+.tech-card h3{font-size:18px;font-weight:700;color:var(--deep);letter-spacing:1px}
+.tech-card p{font-size:13.5px;color:var(--gray);margin-top:10px}
+.tech-card .badge{display:inline-block;margin-top:14px;font-size:11.5px;border-radius:10px;padding:2px 10px}
+.badge-teal{color:var(--teal);background:rgba(47,168,160,.1);border:1px solid rgba(47,168,160,.4)}
+.badge-orange{color:var(--orange);background:rgba(238,130,47,.1);border:1px solid rgba(238,130,47,.4)}
+.auc-strip{margin-top:40px;background:linear-gradient(135deg,#173A7A,#2858C4);border-radius:16px;padding:34px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;color:#fff}
+.auc-strip .lead{font-size:16px;letter-spacing:2px}
+.auc-strip .lead b{color:#7FE3DC}
+.auc-nums{display:flex;gap:34px;flex-wrap:wrap}
+.auc-nums .a{text-align:center}
+.auc-nums .v{font-size:30px;font-weight:700}
+.auc-nums .k{font-size:12px;color:#C9D8F2;margin-top:2px}
+
+/* ============ 合作方 ============ */
+.part-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.part-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:34px 26px;text-align:center;transition:all .35s;position:relative}
+.part-card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(23,58,122,.15);border-color:var(--teal)}
+.part-badge{width:64px;height:64px;margin:0 auto 18px;border-radius:50%;background:linear-gradient(135deg,var(--light),#DCE8F8);color:var(--primary);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;letter-spacing:1px;transition:all .35s}
+.part-card:hover .part-badge{background:linear-gradient(135deg,#2858C4,#2FA8A0);color:#fff;transform:scale(1.08)}
+.part-card h3{font-size:17px;font-weight:700;color:var(--deep)}
+.part-card .role{margin-top:10px;font-size:13px;color:var(--gray)}
+.part-note{margin-top:44px;text-align:center;font-size:13.5px;color:var(--gray)}
+.part-note b{color:var(--primary)}
+
+/* ============ 使用说明 ============ */
+.guide-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.gstep{background:#fff;border-radius:16px;padding:30px 26px;border:1px solid var(--line);position:relative;transition:all .35s}
+.gstep:hover{transform:translateY(-8px);box-shadow:0 16px 36px rgba(23,58,122,.14);border-color:var(--primary)}
+.gstep .gn{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#2858C4,#2FA8A0);color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 8px 18px rgba(40,88,196,.3)}
+.gstep h3{font-size:17px;font-weight:700;color:var(--deep)}
+.gstep p{font-size:13.5px;color:var(--gray);margin-top:8px}
+.gstep .gtag{display:inline-block;margin-top:12px;font-size:11.5px;color:var(--orange);border:1px solid rgba(238,130,47,.45);background:rgba(238,130,47,.08);border-radius:10px;padding:2px 10px}
+.guide-note{margin-top:40px;background:var(--light);border-radius:14px;padding:24px 30px;font-size:13.5px;color:var(--deep);line-height:2}
+.guide-note b{color:var(--orange)}
+
+/* ============ 页脚 ============ */
+footer{background:linear-gradient(160deg,#102B5C,#0C2148);color:#C9D8F2;padding:54px 0 30px}
+.foot-inner{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.foot-brand .fb-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:3px;display:flex;align-items:center;gap:10px}
+.foot-brand .fb-name .lg{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#2858C4,#2FA8A0);display:flex;align-items:center;justify-content:center;font-size:17px}
+.foot-brand p{font-size:12.5px;color:#8FA8D8;margin-top:14px;line-height:2;max-width:420px}
+.foot-cols{display:flex;gap:70px}
+.foot-cols h4{font-size:14px;color:#fff;letter-spacing:2px;margin-bottom:14px}
+.foot-cols a{display:block;font-size:13px;color:#8FA8D8;margin-bottom:10px;transition:color .25s}
+.foot-cols a:hover{color:#7FE3DC}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.1);margin-top:40px;padding-top:22px;text-align:center;font-size:12px;color:#6B84B8;line-height:1.9}
+
+/* ============ 返回顶部 ============ */
+#totop{position:fixed;right:28px;bottom:34px;width:46px;height:46px;border-radius:50%;border:none;background:linear-gradient(135deg,#2858C4,#2FA8A0);color:#fff;font-size:19px;box-shadow:0 8px 22px rgba(40,88,196,.4);opacity:0;pointer-events:none;transition:all .35s;z-index:150}
+#totop.show{opacity:1;pointer-events:auto}
+#totop:hover{transform:translateY(-4px)}
+
+/* ============ 滚动显现 ============ */
+.reveal{opacity:0;transform:translateY(34px);transition:opacity .7s,transform .7s}
+.reveal.show{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
+
+@media (max-width:900px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .panel-grid{grid-template-columns:1fr}
+  .tech-grid{grid-template-columns:repeat(2,1fr)}
+  .part-grid{grid-template-columns:repeat(2,1fr)}
+  .guide-flow{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= 导航 ================= -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#hero"><span class="lg">源</span>源肺悉踪</a>
+    <div class="nav-links">
+      <a href="#data">三种数据</a>
+      <a href="#tech">核心技术</a>
+      <a href="#partners">合作方</a>
+      <a href="#guide">使用说明</a>
+    </div>
+    <button class="nav-btn" onclick="location.href='doctor.html'">进入医生端</button>
+  </div>
+</nav>
+
+<!-- ================= Hero ================= -->
+<header id="hero">
+  <canvas id="particles"></canvas>
+  <div class="hero-grid"></div>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="dot"></span>影像组学 × 蛋白组学 × 临床数据</div>
+    <h1 class="hero-title">源肺悉踪</h1>
+    <p class="hero-sub">全国首个<span class="hl">多组学肺纤</span>动态监测系统</p>
+    <p class="hero-tag">三模态融合 · 自动识别 · <b>风险预测</b> · 全程管理</p>
+    <div class="hero-btns">
+      <button class="hero-btn main" onclick="location.href='doctor.html'">🩺 医生端入口</button>
+      <button class="hero-btn patient" onclick="location.href='patient.html'">👤 患者端入口</button>
+    </div>
+  </div>
+  <div class="hero-scroll"><div class="mouse"></div>向下滑动</div>
+</header>
+
+<!-- ================= 双入口 ================= -->
+<section id="entry" style="padding:80px 0 70px">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="kicker">CHOOSE YOUR ENTRY</div>
+      <h2>选择你的入口</h2>
+      <p class="desc">医生与患者，各自专属的工作界面</p>
+      <div class="sec-line"></div>
+    </div>
+    <div class="entry-grid">
+      <a class="entry-card doc reveal d1" href="doctor.html">
+        <div class="entry-ico">🩺</div>
+        <h3>医生端</h3>
+        <p>病历与病史 · 影像上传 · 三模态融合分析 · 动态监测 · 报告打印</p>
+        <span class="entry-go">进入医生端 →</span>
+      </a>
+      <a class="entry-card pat reveal d2" href="doctor.html">
+        <div class="entry-ico">👤</div>
+        <h3>患者端</h3>
+        <p>在家拍摄影像 · 录入健康数据 · 用药打卡 · 随访提醒</p>
+        <span class="entry-go">进入患者端 →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 数据概览 ================= -->
+<section id="stats" style="padding:0">
+  <div class="stats-grid">
+    <div class="stat-item"><div class="num"><span class="count" data-target="108.7" data-dec="1">0</span><i>/10万</i></div><div class="lbl">间质性肺疾病患病率</div></div>
+    <div class="stat-item"><div class="num"><span class="count" data-target="41.2" data-dec="1">0</span><i>%</i></div><div class="lbl">ILD误诊率</div></div>
+    <div class="stat-item"><div class="num"><span class="count" data-target="9.7" data-dec="1">0</span><i>个月</i></div><div class="lbl">平均诊断延迟</div></div>
+    <div class="stat-item"><div class="num"><span class="count" data-target="50" data-dec="0">0</span><i>%</i></div><div class="lbl">RP-ILD三个月内死亡率</div></div>
+  </div>
+</section>
+
+<!-- ================= 三种数据 ================= -->
+<section id="data">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="kicker">THREE DATA STREAMS</div>
+      <h2>三种数据，一个模型</h2>
+      <p class="desc">把影像、蛋白、临床三类数据融进同一个模型——这是与现有AI产品最根本的区别</p>
+      <div class="sec-line"></div>
+    </div>
+    <div class="tabs reveal">
+      <button class="tab active" data-tab="0" onclick="switchTab(0,this)"><span class="tico">🫁</span>影像组学</button>
+      <button class="tab" data-tab="1" onclick="switchTab(1,this)"><span class="tico">🧪</span>蛋白组学</button>
+      <button class="tab" data-tab="2" onclick="switchTab(2,this)"><span class="tico">📋</span>临床数据</button>
+    </div>
+
+    <div class="panel show" id="panel-0">
+      <div class="panel-grid">
+        <div class="panel-visual">
+          <div class="pv-ico">🫁</div>
+          <div class="pv-title">影像组学数据</div>
+          <div class="pv-sub">HRCT / CT · DICOM 上传 · 自动质控 · 自动分割</div>
+          <div class="pv-flow">
+            <div class="pv-step"><span class="sn">1</span>上传 <b>HRCT/CT DICOM</b> 影像，系统自动质控（层厚 / 剂量 / 伪影）</div>
+            <div class="pv-step"><span class="sn">2</span>自动分割，计算 <b>纤维化体积占比 FV</b> 与 <b>网格影密度 HS</b></div>
+            <div class="pv-step"><span class="sn">3</span>自动识别 <b>纤维化影像模式</b>，量化病灶负荷</div>
+          </div>
+        </div>
+        <div class="panel-info">
+          <h3>从影像里读出纤维化的"面积"和"密度"</h3>
+          <span class="ptag">自动识别 · 量化病灶负荷</span>
+          <p>传统阅片靠医生肉眼估算纤维化范围，不同医生之间差异大。平台对CT进行自动分割，把纤维化程度变成两个可比较的数字——FV（体积占比）和HS（网格影密度），每次随访都能客观比对变化。</p>
+          <div class="panel-points">
+            <div class="pp"><div><b>自动质控</b><span>层厚、剂量、伪影检查一次完成，不合格影像即时提示重扫</span></div></div>
+            <div class="pp"><div><b>动态纤维化进展指数 DFI</b><span>DFI＝FV×HS，与实验室指标融合，量化纤维化进展速度（在研）</span></div></div>
+          </div>
+          <div class="mini-stats">
+            <div class="mini-stat"><div class="v">18.4%</div><div class="k">纤维化体积占比 FV（示例）</div></div>
+            <div class="mini-stat"><div class="v">2.6</div><div class="k">网格影密度 HS（示例）</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-1">
+      <div class="panel-grid">
+        <div class="panel-visual">
+          <div class="pv-ico">🧪</div>
+          <div class="pv-title">蛋白组学数据</div>
+          <div class="pv-sub">KL-6 · CXCL12 · 铁蛋白 · LDH · MDA5抗体滴度</div>
+          <div class="pv-flow">
+            <div class="pv-step"><span class="sn">1</span>录入 <b>血清蛋白标志物</b>（DIA血清蛋白组检测结果）</div>
+            <div class="pv-step"><span class="sn">2</span>指标缺失自动 <b>跨模态生成式填补</b>，缺失≤30%仍可入模</div>
+            <div class="pv-step"><span class="sn">3</span>追踪 <b>ΔKL-6 动态轨迹</b>，预测下次随访疾病进展</div>
+          </div>
+        </div>
+        <div class="panel-info">
+          <h3>标志物不看"一次值"，看"变化轨迹"</h3>
+          <span class="ptag">动态轨迹 · 生成式填补</span>
+          <p>多数研究只看基线单次测量。课题组发现：KL-6的连续变化（ΔKL-6）比单次值更能预测进展——预测下次随访疾病进展的OR达2.57，优于FVC、DLCO和HRCT评分。平台把这条规律做成了可用的功能。</p>
+          <div class="panel-points">
+            <div class="pp"><div><b>跨模态生成式填补</b><span>Lab2Image补影像、Protein2Lab补血清，缺失率30%以上病例仍可入模，数据利用率提升42%</span></div></div>
+            <div class="pp"><div><b>多指标联合</b><span>铁蛋白、LDH、KL-6、MDA5滴度与影像指标同步进入融合模型</span></div></div>
+          </div>
+          <div class="mini-stats">
+            <div class="mini-stat"><div class="v">2.57</div><div class="k">ΔKL-6 预测进展 OR值</div></div>
+            <div class="mini-stat"><div class="v">+42%</div><div class="k">数据利用率提升</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-2">
+      <div class="panel-grid">
+        <div class="panel-visual">
+          <div class="pv-ico">📋</div>
+          <div class="pv-title">临床数据</div>
+          <div class="pv-sub">8个核心变量 · BorutaShap筛选 · 逻辑回归模型</div>
+          <div class="pv-flow">
+            <div class="pv-step"><span class="sn">1</span><b>BorutaShap</b> 从25个临床变量中筛出 <b>8个关键特征</b></div>
+            <div class="pv-step"><span class="sn">2</span>比较6种机器学习模型，<b>逻辑回归（LR）</b> 最优</div>
+            <div class="pv-step"><span class="sn">3</span>输入8个指标，输出 <b>3个月死亡风险</b> 与可解释依据</div>
+          </div>
+        </div>
+        <div class="panel-info">
+          <h3>8个指标，就能算出3个月死亡风险</h3>
+          <span class="ptag">核心模型 v1.0 · 已上线验证</span>
+          <p>基于多中心509例数据建模，8个变量全部是临床上随手可得的指标——RP-ILD、ESR、ALB、年龄、CRP、AST、NLR、LDH，不需要额外检查。模型已上线为网页版工具，输入即出结果。</p>
+          <div class="panel-points">
+            <div class="pp"><div><b>SHAP可解释</b><span>每个变量对风险的贡献一目了然，RP-ILD是最重要的预测因子</span></div></div>
+            <div class="pp"><div><b>多中心外部验证</b><span>外部验证两个队列AUC达0.836与0.915</span></div></div>
+          </div>
+          <div class="mini-stats">
+            <div class="mini-stat"><div class="v">509例</div><div class="k">多中心建模数据</div></div>
+            <div class="mini-stat"><div class="v">0.90</div><div class="k">训练集AUC</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 核心技术 ================= -->
+<section id="tech" class="sec-alt">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="kicker">CORE TECHNOLOGY</div>
+      <h2>核心技术</h2>
+      <p class="desc">四件事：融合、动态、可解释、安全</p>
+      <div class="sec-line"></div>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-card reveal d1">
+        <div class="tech-ico">🔗</div>
+        <h3>多模态融合</h3>
+        <p>影像、蛋白、临床三类数据融进同一个模型，互相补位——现有产品只做单一影像识别，没有一家覆盖ILD多组学融合。</p>
+        <span class="badge badge-orange">融合模型 v2.1 · 在研试用</span>
+      </div>
+      <div class="tech-card reveal d2">
+        <div class="tech-ico">📈</div>
+        <h3>动态监测</h3>
+        <p>铁蛋白、LDH、KL-6、MDA5滴度和纤维化体积拆成"基线-斜率-加速度"三维时序参数，每次复诊刷新风险，第2周即可识别高危个体。</p>
+        <span class="badge badge-orange">动态监测模块 · 在研</span>
+      </div>
+      <div class="tech-card reveal d3">
+        <div class="tech-ico">🔍</div>
+        <h3>可解释</h3>
+        <p>SHAP输出每个变量的贡献；时序SHAP解释风险波动来源——例："本周Δ概率+3.7%，主要归因于铁蛋白斜率增加"。每一步预测都可追溯。</p>
+        <span class="badge badge-teal">已上线</span>
+      </div>
+      <div class="tech-card reveal d4">
+        <div class="tech-ico">🛡️</div>
+        <h3>数据安全</h3>
+        <p>联邦学习机制：多中心联合更新模型，原始数据不出院；平台对接医院LIS/PACS零改造上线，普通设备即可部署。</p>
+        <span class="badge badge-teal">已上线</span>
+      </div>
+    </div>
+    <div class="auc-strip reveal">
+      <div class="lead">核心模型 · <b>3个月死亡风险预测</b>　多中心外部验证</div>
+      <div class="auc-nums">
+        <div class="a"><div class="v">0.90</div><div class="k">训练集AUC</div></div>
+        <div class="a"><div class="v">0.866</div><div class="k">内部验证AUC</div></div>
+        <div class="a"><div class="v">0.836</div><div class="k">测试集AUC</div></div>
+        <div class="a"><div class="v">0.836 / 0.915</div><div class="k">外部验证两队列AUC</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 合作方 ================= -->
+<section id="partners">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="kicker">PARTNERS</div>
+      <h2>合作方</h2>
+      <p class="desc">临床数据、技术专利、平台依托——每一环都有真实的合作支撑</p>
+      <div class="sec-line"></div>
+    </div>
+    <div class="part-grid">
+      <div class="part-card reveal d1">
+        <div class="part-badge">广医附一</div>
+        <h3>广州医科大学附属第一医院<br>广州呼吸健康研究院</h3>
+        <p class="role">核心数据来源与依托单位</p>
+      </div>
+      <div class="part-card reveal d2">
+        <div class="part-badge">厦大附一</div>
+        <h3>厦门大学附属第一医院</h3>
+        <p class="role">临床应用探索</p>
+      </div>
+      <div class="part-card reveal d3">
+        <div class="part-badge">湖州</div>
+        <h3>湖州市中心医院</h3>
+        <p class="role">临床应用探索</p>
+      </div>
+      <div class="part-card reveal d1">
+        <div class="part-badge">时迈</div>
+        <h3>杭州时迈智能技术有限公司</h3>
+        <p class="role">核心专利授权使用</p>
+      </div>
+      <div class="part-card reveal d2">
+        <div class="part-badge">国家平台</div>
+        <h3>呼吸疾病国家重点实验室<br>国家呼吸医学中心<br>国家呼吸疾病临床医学研究中心</h3>
+        <p class="role">平台依托</p>
+      </div>
+      <div class="part-card reveal d3">
+        <div class="part-badge">30+</div>
+        <h3>全国30余家三甲医院</h3>
+        <p class="role">多中心合作网络</p>
+      </div>
+    </div>
+    <p class="part-note reveal">项目依托：<b>大创立项</b>——快速进展性间质性肺疾病队列建设及风险预测模型建立</p>
+  </div>
+</section>
+
+<!-- ================= 使用说明 ================= -->
+<section id="guide" class="sec-alt">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="kicker">HOW TO USE</div>
+      <h2>使用说明</h2>
+      <p class="desc">六步完成一次分析，普通医院设备即可使用</p>
+      <div class="sec-line"></div>
+    </div>
+    <div class="guide-flow">
+      <div class="gstep reveal d1">
+        <div class="gn">1</div>
+        <h3>医生登录</h3>
+        <p>使用医院分配的账号登录平台，进入工作台查看在管患者与高危预警。</p>
+      </div>
+      <div class="gstep reveal d2">
+        <div class="gn">2</div>
+        <h3>填写患者信息</h3>
+        <p>姓名、年龄、住院号、诊断类型；选择"抗MDA5阳性DM-ILD"时自动标记RP-ILD。</p>
+      </div>
+      <div class="gstep reveal d3">
+        <div class="gn">3</div>
+        <h3>上传影像</h3>
+        <p>上传HRCT/CT的DICOM文件，系统自动质控并完成纤维化分割。</p>
+      </div>
+      <div class="gstep reveal d1">
+        <div class="gn">4</div>
+        <h3>录入蛋白标志物</h3>
+        <p>KL-6、铁蛋白、LDH、MDA5滴度等；指标缺失时自动跨模态生成式填补。</p>
+      </div>
+      <div class="gstep reveal d2">
+        <div class="gn">5</div>
+        <h3>核对临床数据</h3>
+        <p>8个核心变量，年龄与LDH自动带入，核对后开始融合分析（约30秒）。</p>
+      </div>
+      <div class="gstep reveal d3">
+        <div class="gn">6</div>
+        <h3>查看报告与随访</h3>
+        <p>风险总分＋SHAP解释＋动态趋势，可打印或导出PDF；随访节点自动提醒。</p>
+        <span class="gtag">随访节点：第2周 · 第4周 · 1/3/6/9/12月</span>
+      </div>
+    </div>
+    <div class="guide-note reveal">
+      <b>使用须知：</b>本系统仅供临床研究使用，分析结果不作为临床诊断依据；所有分析结果经联邦学习机制本地计算，原始数据不出院；多模态融合与动态监测模块当前在研，正式上线前以院内验证为准。
+    </div>
+  </div>
+</section>
+
+<!-- ================= 页脚 ================= -->
+<footer>
+  <div class="container foot-inner">
+    <div class="foot-brand">
+      <div class="fb-name"><span class="lg">源</span>源肺悉踪</div>
+      <p>全国首个多组学肺纤动态监测系统<br>影像组学 × 蛋白组学 × 临床数据 · 三模态融合<br>广州医科大学 · 源肺悉踪项目组</p>
+    </div>
+    <div class="foot-cols">
+      <div>
+        <h4>平台</h4>
+        <a href="#data">三种数据</a>
+        <a href="#tech">核心技术</a>
+        <a href="#guide">使用说明</a>
+      </div>
+      <div>
+        <h4>关于</h4>
+        <a href="#partners">合作方</a>
+        <a href="#hero">回到顶部</a>
+      </div>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    本网站内容仅供临床研究与交流使用，分析结果不作为临床诊断依据<br>
+    © 2026 源肺悉踪项目组 · 广州医科大学
+  </div>
+</footer>
+
+<button id="totop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+/* ---------- 粒子背景 ---------- */
+(function(){
+  var cv = document.getElementById('particles');
+  var ctx = cv.getContext('2d');
+  var W, H, dots = [];
+  function resize(){
+    W = cv.width = cv.offsetWidth;
+    H = cv.height = cv.offsetHeight;
+    dots = [];
+    var n = Math.min(70, Math.floor(W * H / 18000));
+    for(var i = 0; i < n; i++){
+      dots.push({
+        x: Math.random() * W, y: Math.random() * H,
+        r: Math.random() * 2.2 + 0.6,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        c: Math.random() > 0.5 ? 'rgba(127,227,220,α)' : 'rgba(191,214,245,α)',
+        a: Math.random() * 0.45 + 0.15
+      });
+    }
+  }
+  function tick(){
+    ctx.clearRect(0, 0, W, H);
+    for(var i = 0; i < dots.length; i++){
+      var d = dots[i];
+      d.x += d.vx; d.y += d.vy;
+      if(d.x < 0) d.x = W; if(d.x > W) d.x = 0;
+      if(d.y < 0) d.y = H; if(d.y > H) d.y = 0;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = d.c.replace('α', d.a);
+      ctx.fill();
+    }
+    // 邻近连线
+    for(var j = 0; j < dots.length; j++){
+      for(var k = j + 1; k < dots.length; k++){
+        var dx = dots[j].x - dots[k].x, dy = dots[j].y - dots[k].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if(dist < 110){
+          ctx.beginPath();
+          ctx.moveTo(dots[j].x, dots[j].y);
+          ctx.lineTo(dots[k].x, dots[k].y);
+          ctx.strokeStyle = 'rgba(127,227,220,' + (0.12 * (1 - dist / 110)) + ')';
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  resize(); tick();
+  window.addEventListener('resize', resize);
+})();
+
+/* ---------- 导航栏状态 ---------- */
+(function(){
+  var nav = document.getElementById('nav');
+  function onScroll(){
+    if(window.scrollY > 60) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+    var t = document.getElementById('totop');
+    if(window.scrollY > 600) t.classList.add('show');
+    else t.classList.remove('show');
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+})();
+
+/* ---------- 滚动显现 ---------- */
+(function(){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target); }
+    });
+  }, {threshold: 0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+})();
+
+/* ---------- 数字滚动 ---------- */
+(function(){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el = e.target;
+      io.unobserve(el);
+      var target = parseFloat(el.dataset.target);
+      var dec = parseInt(el.dataset.dec || '0');
+      var t0 = null, dur = 1400;
+      function step(ts){
+        if(!t0) t0 = ts;
+        var p = Math.min(1, (ts - t0) / dur);
+        var ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = (target * ease).toFixed(dec);
+        if(p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }, {threshold: 0.5});
+  document.querySelectorAll('.count').forEach(function(el){ io.observe(el); });
+})();
+
+/* ---------- 选项卡 ---------- */
+var tabTimer = null;
+function switchTab(i, btn){
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('show'); });
+  document.getElementById('panel-' + i).classList.add('show');
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  restartAuto();
+}
+function restartAuto(){
+  if(tabTimer) clearInterval(tabTimer);
+  tabTimer = setInterval(function(){
+    var cur = document.querySelector('.tab.active');
+    var next = cur.nextElementSibling || document.querySelector('.tab');
+    switchTab(parseInt(next.dataset.tab), next);
+  }, 6000);
+}
+restartAuto();
+
+/* ---------- 平滑滚动 ---------- */
+function scrollToId(id){
+  var el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth'});
+}
+
+/* ---------- 进入平台 ---------- */
+function openPlatform(){
+  location.href = '源肺悉踪_医生端.html';
+}
+</script>
+</body>
+</html>
+
