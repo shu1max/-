@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>源肺悉踪 · 患者端</title>
+<title>源肺悉踪 · 患者端（复查总览）</title>
+<!-- ================================================
+部署说明(重要):本页所有跳转链接已写成 https 绝对地址。
+上传到 GitHub Pages 后,把本页所有"你的用户名"替换成你的
+GitHub 用户名即可(仓库名默认 yfsz,如不同请一并替换)。
+================================================ -->
 <style>
 :root{
   --deep:#173A7A; --primary:#2858C4; --light:#E8F0FB; --teal:#2FA8A0;
@@ -23,276 +28,663 @@ button{cursor:pointer;font-family:inherit}
 .topbar .hosp{font-size:12px;color:#C9D8F2;margin-top:6px}
 .topbar .home-link{float:right;font-size:12px;color:#C9D8F2;text-decoration:none;border:1px solid rgba(255,255,255,.4);border-radius:12px;padding:3px 10px}
 .topbar .home-link:hover{background:rgba(255,255,255,.12);color:#fff}
-.content{flex:1;padding:18px 18px 96px}
+.content{flex:1;padding:18px 18px 110px}
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:100}
-.bottom-nav .bn{flex:1;text-align:center;padding:12px 0 14px;font-size:15px;color:var(--gray);cursor:pointer}
+.bottom-nav .bn{flex:1;text-align:center;padding:11px 0 14px;font-size:14px;color:var(--gray);cursor:pointer}
 .bottom-nav .bn.active{color:var(--primary);font-weight:700}
-.bottom-nav .bn .bi{display:block;font-size:20px;margin-bottom:2px}
+.bottom-nav .bn .bi{display:block;font-size:19px;margin-bottom:2px}
 
 /* ---------- 卡片 ---------- */
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(23,58,122,.05)}
 .card h3{font-size:17px;font-weight:700;color:var(--deep);margin-bottom:14px}
+.card h3 .sub{font-weight:400;font-size:12.5px;color:var(--gray);margin-left:6px}
 .sec-tip{font-size:13px;color:var(--gray);background:var(--light);border-radius:10px;padding:12px 16px;line-height:1.9;margin-bottom:16px}
 .sec-tip b{color:var(--primary)}
-
-/* ---------- 医生留言 ---------- */
-.doc-msg{display:flex;gap:12px}
-.doc-ava{width:44px;height:44px;border-radius:50%;background:var(--light);color:var(--primary);font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;font-size:17px}
-.msg-bubble{background:var(--light);border-radius:4px 14px 14px 14px;padding:12px 16px;font-size:14.5px;line-height:1.9;color:var(--ink);flex:1}
-.msg-time{font-size:11px;color:var(--ph);margin-top:6px;text-align:right}
+.badge{display:inline-block;border-radius:10px;font-size:12px;padding:2px 9px;font-weight:700}
+.badge-teal{background:#E0F2F0;color:var(--teal)}
+.badge-orange{background:#FDF0E4;color:var(--orange)}
+.badge-red{background:#FBE5E5;color:var(--red)}
+.badge-gray{background:#EEF1F7;color:var(--gray)}
 
 /* ---------- 紧急提醒 ---------- */
-.alert-bar{background:#FDF1F1;border:1px solid #F3C5C5;border-radius:14px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start;margin-bottom:16px}
-.alert-bar .ai{font-size:22px;flex:none;line-height:1.2}
-.alert-bar .at b{color:var(--red);font-size:15px}
-.alert-bar .at div{font-size:13.5px;color:#8A4A4A;line-height:1.8;margin-top:4px}
+.alert-bar{background:#FDF1F1;border:1px solid #F3C5C5;border-radius:14px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;margin-bottom:16px}
+.alert-bar .ai{font-size:20px;flex:none;line-height:1.3}
+.alert-bar .at{font-size:13px;color:#8A4A4A;line-height:1.8}
+.alert-bar .at b{color:var(--red)}
 
-/* ---------- 今日任务 ---------- */
-.task{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
-.task .tn{width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
-.task .tt{flex:1;font-size:15px;color:var(--ink)}
-.task .tt small{display:block;font-size:12px;color:var(--gray);margin-top:3px}
-.task .ta{flex:none}
-.done-chip{background:var(--teal);color:#fff;border-radius:12px;font-size:12px;padding:3px 10px}
+/* ---------- 复查信息 ---------- */
+.visit-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.visit-head .vd{flex:1}
+.visit-head .vd b{font-size:19px;color:var(--deep)}
+.visit-head .vd div{font-size:13px;color:var(--gray);line-height:1.8;margin-top:4px}
+.visit-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.vchip{border:1.5px solid #D5DBE8;border-radius:18px;padding:5px 13px;font-size:13px;color:var(--gray);cursor:pointer;background:#fff}
+.vchip.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}
 
-/* ---------- 大按钮 ---------- */
-.big-btn{display:block;width:100%;border:2px dashed var(--primary);background:var(--light);border-radius:14px;padding:26px 16px;text-align:center;font-size:18px;font-weight:700;color:var(--primary);margin-bottom:14px;transition:.2s}
-.big-btn:hover{background:#DDE9FA}
-.big-btn .bi{display:block;font-size:34px;margin-bottom:8px}
-.big-btn small{display:block;font-size:13px;font-weight:400;color:var(--gray);margin-top:6px}
-.big-btn.solid{background:var(--primary);border-color:var(--primary);color:#fff}
-.big-btn.solid:hover{background:#2049AC}
-.big-btn.ghost{background:#fff;border:1px solid var(--primary);font-size:16px;padding:16px}
-.big-btn.ghost:hover{background:var(--light)}
+/* ---------- 风险卡 ---------- */
+.risk-row{display:flex;align-items:center;gap:14px}
+.risk-num{font-size:44px;font-weight:800;color:var(--deep);line-height:1}
+.risk-row .badge{margin-top:8px}
+.risk-total{font-size:12.5px;color:var(--gray);margin-top:6px}
+.risk-delta{font-size:13px;color:var(--orange);font-weight:700;margin-top:8px}
+.risk-delta.good{color:var(--teal)}
+.risk-bar{position:relative;height:14px;border-radius:8px;background:#EDF1F8;margin-top:18px}
+.risk-bar .seg{position:absolute;top:0;bottom:0;border-right:2px solid #fff}
+.risk-bar .mark{position:absolute;top:-5px;width:4px;height:24px;border-radius:2px;background:var(--orange);transform:translateX(-2px)}
+.risk-bar .th{position:absolute;top:-5px;bottom:-5px;border-left:1.5px dashed var(--red)}
+.risk-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--ph);margin-top:6px}
 
-/* ---------- 拍摄指引 ---------- */
-.guide-step{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
-.guide-step .gn{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none}
-.guide-step .gt{font-size:15px;line-height:1.7;color:var(--ink);flex:1}
-.guide-step .gt b{color:var(--deep)}
+/* ---------- 入口三宫格 ---------- */
+.entry-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.entry2{border:1.5px solid var(--line);border-radius:14px;padding:16px 8px;text-align:center;background:#fff;transition:.2s}
+.entry2:hover{border-color:var(--primary);background:var(--light)}
+.entry2 .ei{font-size:28px;display:block;margin-bottom:8px}
+.entry2 .et{font-size:14px;font-weight:700;color:var(--deep)}
+.entry2 .ed{font-size:11px;color:var(--ph);margin-top:4px}
 
-/* ---------- 照片预览 ---------- */
-.preview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.pv{position:relative;aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#3d4f6e,#24344e);display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px}
+/* ---------- 关键指标 ---------- */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:10px 8px;text-align:center;background:#FAFBFE}
+.kpi .kn{font-size:12px;color:var(--gray)}
+.kpi .kv{font-size:16px;font-weight:800;margin-top:5px}
+.kpi .kv.up{color:var(--red)}
+.kpi .kv.down{color:var(--orange)}
+.kpi .kv.ok{color:var(--teal)}
+
+/* ---------- 表格 ---------- */
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{background:var(--light);color:var(--deep);font-weight:700;padding:9px 8px;text-align:left;font-size:12.5px}
+.tbl th:first-child{border-radius:8px 0 0 8px}
+.tbl th:last-child{border-radius:0 8px 8px 0}
+.tbl td{padding:10px 8px;border-bottom:1px solid var(--line);color:var(--ink)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .grp{background:#F7F9FD;color:var(--deep);font-weight:700;font-size:12.5px}
+.tbl .grp td{padding:8px 8px}
+.tbl .up{color:var(--red);font-weight:700}
+.tbl .down{color:var(--orange);font-weight:700}
+.tbl .ok{color:var(--teal);font-weight:700}
+.tbl .tr{font-size:12px;color:var(--gray)}
+
+/* ---------- 影像 ---------- */
+.ct-box{position:relative;border-radius:12px;overflow:hidden;cursor:zoom-in;border:1px solid var(--line);margin-bottom:10px;background:#0b0b0b}
+.ct-box img{display:block;width:100%;height:auto;border-radius:10px}
+.ct-cap{font-size:12.5px;color:var(--gray);text-align:center;margin-bottom:14px}
+.img-report{background:#FAFBFE;border:1px solid var(--line);border-radius:12px;padding:16px;font-size:14px;line-height:2;color:var(--ink)}
+.img-report b{color:var(--deep)}
+
+/* ---------- 模态（影像放大） ---------- */
+.modal-mask{position:fixed;inset:0;background:rgba(10,20,40,.86);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:#0b0b0b;border-radius:16px;max-width:520px;width:100%;max-height:88vh;overflow:auto;padding:14px}
+.modal-box .mt{display:flex;justify-content:space-between;align-items:center;color:#fff;font-size:14px;padding:2px 4px 12px}
+.modal-box .mx{background:none;border:none;color:#aaa;font-size:20px}
+.modal-box img{width:100%;height:auto}
+.modal-box .mc{color:#bbb;font-size:12.5px;line-height:1.9;padding:10px 4px 2px}
+
+/* ---------- 报告判读 ---------- */
+.plain-box{background:var(--light);border-radius:12px;padding:14px 16px;font-size:14.5px;line-height:1.9;color:var(--ink)}
+.plain-box b{color:var(--deep)}
+.factor{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#FAFBFE}
+.factor .fh{font-weight:700;font-size:14.5px;color:var(--deep)}
+.factor .fh .badge{margin-left:6px}
+.factor .fd{font-size:13px;color:var(--gray);line-height:1.8;margin-top:5px}
+.modal-bar{background:var(--light);border-radius:10px;padding:12px 14px;margin-bottom:6px}
+.mlbl{display:flex;justify-content:space-between;font-size:12.5px;color:var(--gray);margin-bottom:5px}
+.mtrack{height:8px;border-radius:5px;background:#DDE4F0;overflow:hidden}
+.mfill{height:100%;border-radius:5px}
+.find-card{background:#FDF0E4;border-radius:10px;padding:12px 14px;font-size:13.5px;line-height:1.9;color:#8A4A4A;margin-bottom:10px}
+.advice-card{background:#E0F2F0;border-radius:10px;padding:12px 14px;font-size:13.5px;line-height:1.9;color:#1F6E67;margin-bottom:10px}
+.report-foot{font-size:11.5px;color:var(--ph);text-align:center;margin-top:12px}
+
+/* ---------- 指标解读 ---------- */
+.group-title{display:flex;align-items:center;gap:8px;margin:20px 0 10px;font-size:15px;font-weight:700;color:var(--deep)}
+.group-title .gl{width:4px;height:16px;border-radius:2px;background:var(--primary)}
+.ind-card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:#fff}
+.ind-card .ih{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.ind-card .ih b{font-size:15px;color:var(--deep)}
+.ind-card .ih .val{font-weight:700;font-size:14px}
+.ind-card .ih .val.up{color:var(--red)}
+.ind-card .ih .val.down{color:var(--orange)}
+.ind-card .ih .val.ok{color:var(--teal)}
+.ind-card .ir{font-size:12px;color:var(--ph);margin-top:3px}
+.ind-card .ir b{color:var(--gray);font-weight:400}
+.ind-card .il{font-size:13.5px;line-height:1.9;margin-top:9px}
+.ind-card .il .lb{display:inline-block;font-size:11.5px;color:var(--primary);background:var(--light);border-radius:6px;padding:1px 8px;margin-right:6px}
+.ind-card .plain{background:#F6F9FF;border-left:3px solid var(--primary);border-radius:0 8px 8px 0;padding:8px 12px;font-size:13.5px;line-height:1.9;color:var(--ink);margin-top:9px}
+.note-list{list-style:none}
+.note-list li{display:flex;gap:10px;font-size:14px;line-height:1.9;padding:9px 0;border-bottom:1px dashed var(--line)}
+.note-list li:last-child{border-bottom:none}
+.note-list .ni{flex:none;width:24px;height:24px;border-radius:50%;background:var(--light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:13px}
+.note-list b{color:var(--deep)}
+
+/* ---------- 随访 ---------- */
+.chip{display:inline-block;padding:9px 18px;border:1.5px solid #D5DBE8;border-radius:22px;font-size:15px;color:var(--gray);margin:0 8px 10px 0;cursor:pointer;transition:all .2s;user-select:none;background:#fff}
+.chip.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}
+.slider-row{margin-bottom:16px}
+.slider-row .sl-h{display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px}
+.slider-row .sl-h b{color:var(--ink)}
+.slider-row .sl-h .sv{font-weight:700;color:var(--primary)}
+.slider-row input[type=range]{width:100%;accent-color:var(--primary)}
+.slider-row .sl-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--ph);margin-top:3px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:15px;color:var(--ink);font-weight:700;margin-bottom:8px}
+.field label small{font-weight:400;color:var(--gray);font-size:12.5px;margin-left:8px}
+.field input{width:100%;height:50px;border:1px solid #D5DBE8;border-radius:10px;font-size:20px;font-weight:700;color:var(--primary);padding:0 16px;text-align:center}
+.field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(40,88,196,.12)}
+textarea{width:100%;border:1.5px solid #D5DBE8;border-radius:12px;padding:12px 14px;font-size:14.5px;font-family:inherit;color:var(--ink);line-height:1.8;resize:vertical;min-height:86px}
+textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(40,88,196,.12);outline:none}
+.preview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.pv{position:relative;aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#3d4f6e,#24344e);display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px}
 .pv img{width:100%;height:100%;object-fit:cover;border-radius:10px}
 .pv .del{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:12px;line-height:22px;text-align:center}
 .pv-hint{grid-column:1/-1;font-size:12px;color:var(--gray);text-align:center;margin-top:6px}
+.his-item{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#FAFBFE}
+.his-item .hd{flex:1}
+.his-item .hd b{font-size:14.5px;color:var(--ink)}
+.his-item .hd div{font-size:12px;color:var(--gray);margin-top:3px;line-height:1.7}
+.his-item .ha{flex:none}
 
-/* ---------- 指标输入 ---------- */
-.field{margin-bottom:18px}
-.field label{display:block;font-size:15px;color:var(--ink);font-weight:700;margin-bottom:8px}
-.field label small{font-weight:400;color:var(--gray);font-size:12.5px;margin-left:8px}
-.field input{width:100%;height:52px;border:1px solid #D5DBE8;border-radius:10px;font-size:22px;font-weight:700;color:var(--primary);padding:0 16px;text-align:center}
-.field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(40,88,196,.12)}
-.field input::placeholder{color:#C5CCDC;font-weight:400;font-size:16px}
-.field .unit{font-size:12px;color:var(--gray);margin-top:5px}
-.chip{display:inline-block;padding:9px 18px;border:1.5px solid #D5DBE8;border-radius:22px;font-size:15px;color:var(--gray);margin:0 8px 10px 0;cursor:pointer;transition:all .2s;user-select:none;background:#fff}
-.chip.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700}
-.chip.radio{display:inline-block}
-
-/* ---------- 底部提交 ---------- */
-.submit-bar{position:fixed;bottom:64px;left:50%;transform:translateX(-50%);width:100%;max-width:560px;background:#fff;padding:10px 18px;border-top:1px solid var(--line);z-index:90}
-.submit-btn{display:block;width:100%;height:52px;border:none;border-radius:12px;font-size:18px;font-weight:700;letter-spacing:4px;color:#fff}
-.submit-btn.ready{background:var(--primary)}
-.submit-btn.ready:hover{background:#2049AC}
-.submit-btn.wait{background:#C5CCDC;cursor:not-allowed}
-
-/* ---------- 成功页 ---------- */
-.success{text-align:center;padding:60px 20px}
-.success .si{width:86px;height:86px;border-radius:50%;background:var(--teal);color:#fff;font-size:44px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
-.success h2{font-size:22px;color:var(--deep)}
-.success .st{font-size:15px;color:var(--gray);line-height:1.9;margin:14px 0 26px}
+/* ---------- 大按钮 ---------- */
+.big-btn{display:block;width:100%;border:none;background:var(--primary);border-radius:14px;padding:16px;text-align:center;font-size:18px;font-weight:700;letter-spacing:3px;color:#fff;margin-bottom:4px;transition:.2s}
+.big-btn:hover{background:#2049AC}
+.big-btn.ghost{background:#fff;border:1.5px solid var(--primary);color:var(--primary);font-size:15px;padding:13px;margin-bottom:10px}
+.big-btn.ghost:hover{background:var(--light)}
 
 /* ---------- Toast ---------- */
 #toast{position:fixed;left:50%;bottom:130px;transform:translateX(-50%);background:rgba(23,58,122,.92);color:#fff;font-size:14px;padding:10px 24px;border-radius:24px;opacity:0;pointer-events:none;transition:.3s;z-index:999;white-space:nowrap}
 #toast.show{opacity:1}
+
+/* ---------- 页脚 ---------- */
+.foot-note{font-size:11.5px;color:var(--ph);text-align:center;line-height:1.9;padding:6px 0 2px}
 </style>
 </head>
 <body>
 <div class="shell">
 
   <header class="topbar">
-    <a class="home-link" href="源肺悉踪_官网封面页.html">官网首页</a>
+    <a class="home-link" href="https://你的用户名.github.io/yfsz/源肺悉踪_官网封面页.html">官网首页</a>
     <div class="hello">您好，陈建国<small>G20261001</small></div>
     <div class="hosp">广州医科大学附属第一医院 · 呼吸与危重症医学科</div>
   </header>
 
   <div class="content">
 
-    <!-- ============ 首页 ============ -->
-    <section id="page-home" class="page">
+    <!-- ============ 复查总览 ============ -->
+    <section id="page-overview" class="page">
 
       <div class="alert-bar">
         <span class="ai">⚠️</span>
-        <div class="at">
-          <b>紧急提醒：请立即联系我们</b>
-          <div>如果出现<b>明显气促加重、胸闷、咯血</b>，请马上拨打电话 020-83062000，或直接到急诊就诊，不要等医生回复。</div>
-        </div>
+        <div class="at">如果出现<b>明显气促加重、胸闷、咯血</b>，请马上拨打电话 020-83062000，或直接到急诊就诊，不要等医生回复。</div>
       </div>
 
       <div class="card">
-        <h3>👩‍⚕️ 医生留言</h3>
-        <div class="doc-msg">
-          <span class="doc-ava">韩</span>
+        <h3>📅 复查记录</h3>
+        <div class="visit-head">
+          <div class="vd">
+            <b id="v-date">2026-10-15 复查</b>
+            <div id="v-info">第6次（本次）｜呼吸与危重症医学科｜主诊医生：韩茜 副主任医师<br>诊断：抗MDA5阳性皮肌炎相关间质性肺病（DM-ILD）</div>
+          </div>
+        </div>
+        <div class="visit-chips" id="visit-chips"></div>
+        <div class="sec-tip" style="margin:0">更早的复查只保存了关键指标（KL-6、铁蛋白、LDH），完整检查单请以医院报告为准。</div>
+      </div>
+
+      <div class="card">
+        <h3>🎯 3个月风险 <span class="sub">本次复查评估</span></h3>
+        <div class="risk-row">
+          <span class="risk-num" id="risk-num">35.2%</span>
           <div>
-            <div class="msg-bubble">陈叔您好，请在本周内完成两件事：<b>① 拍一次CT胶片照片</b>，<b>② 录入本周的血氧、体温、体重</b>。如果您查了血，把化验单上的 KL-6、铁蛋白、LDH 也一起填上。如有任何不舒服，随时留言。</div>
-            <div class="msg-time">韩茜医生 · 2026-10-18 09:24</div>
+            <span class="badge badge-orange" id="risk-badge">中高风险</span>
+            <div class="risk-total" id="risk-total">风险总分 70（0-40低 / 41-70中 / 71-100高）</div>
+          </div>
+        </div>
+        <div class="risk-delta" id="risk-delta">较上次复查 ↑ 1.0 个百分点</div>
+        <div class="risk-bar">
+          <div class="seg" style="left:0;width:41%;background:#CFE9E6"></div>
+          <div class="seg" style="left:41%;width:30%;background:#F8E3CD"></div>
+          <div class="seg" style="left:71%;width:29%;background:#F3CDCD"></div>
+          <div class="th" style="left:40%"></div>
+          <div class="mark" id="risk-mark" style="left:35.2%"></div>
+        </div>
+        <div class="risk-scale"><span>0% 低</span><span>41% 中</span><span>71% 高</span><span>100%</span></div>
+        <div class="sec-tip" style="margin:14px 0 0">这个数字是系统对<b>未来3个月</b>的疾病相关风险评估，属于<b>中高风险</b>，意思是需要重视、按医嘱积极治疗和随访，<b>不等于病情一定会恶化</b>。具体以医生当面沟通为准。</div>
+      </div>
+
+      <div class="entry-grid">
+        <button class="entry2" onclick="goResults('blood')"><span class="ei">🩸</span><span class="et">血常规结果</span><span class="ed">血液与炎症指标</span></button>
+        <button class="entry2" onclick="goResults('image')"><span class="ei">🫁</span><span class="et">影像图</span><span class="ed">电子版CT</span></button>
+        <button class="entry2" onclick="goResults('report')"><span class="ei">📄</span><span class="et">报告判读</span><span class="ed">风险解释与建议</span></button>
+      </div>
+
+      <div class="card">
+        <h3>📊 本次关键指标速览</h3>
+        <div class="kpi-grid" id="kpi-grid"></div>
+        <div class="sec-tip" style="margin:14px 0 0">红色＝偏高，橙色＝偏低/下降。<b>KL-6 和铁蛋白</b>是医生重点关注的纤维化活动指标。每项含义见「指标解读」。</div>
+      </div>
+
+      <div class="card">
+        <h3>👩‍⚕️ 医生建议摘要</h3>
+        <ul class="note-list">
+          <li><span class="ni">1</span><div><b>2周内复查</b>（10-29前）：抽血查 KL-6、铁蛋白、血常规，医生要看趋势。</div></li>
+          <li><span class="ni">2</span><div><b>规律治疗</b>：按现方案用药，激素等药物不可自行停药或加减。</div></li>
+          <li><span class="ni">3</span><div><b>及时就医</b>：气促明显加重、发热、咳痰增多，或静息血氧低于92%，马上联系医生。</div></li>
+        </ul>
+        <div class="sec-tip" style="margin:10px 0 0">完整建议和日常注意事项在「指标解读」页。</div>
+      </div>
+
+      <div class="card">
+        <h3>⏰ 下次复查提醒</h3>
+        <ul class="note-list">
+          <li><span class="ni">🗓</span><div><b>2026-10-29（周四）· 还有8天</b>　空腹抽血：KL-6、铁蛋白、血常规</div></li>
+          <li><span class="ni">💨</span><div>复查<b>肺功能</b>（FVC、DLCO）；是否需要复查CT由医生安排</div></li>
+          <li><span class="ni">📂</span><div>带齐：既往化验单、CT报告、正在吃的药单</div></li>
+        </ul>
+      </div>
+
+    </section>
+
+    <!-- ============ 检查结果 ============ -->
+    <section id="page-results" class="page hidden">
+
+      <div class="card" style="padding:14px">
+        <div class="visit-chips" style="margin:0 0 4px">
+          <span class="vchip on" onclick="goResults('blood')">🩸 血常规</span>
+          <span class="vchip" onclick="goResults('image')">🫁 影像图</span>
+          <span class="vchip" onclick="goResults('report')">📄 报告判读</span>
+        </div>
+        <div style="font-size:12px;color:var(--ph)">以下为最近一次复查（2026-10-15）的结果</div>
+      </div>
+
+      <!-- 血常规 -->
+      <div class="card" id="sec-blood">
+        <h3>🩸 血常规与化验结果 <span class="sub">2026-10-15</span></h3>
+        <table class="tbl">
+          <tr><th>项目</th><th>结果</th><th>参考范围</th><th>较上次</th><th>状态</th></tr>
+          <tr class="grp"><td colspan="5">血常规</td></tr>
+          <tr><td>白细胞计数</td><td>7.1 ×10⁹/L</td><td>3.5–9.5</td><td class="tr">—</td><td class="ok">正常</td></tr>
+          <tr><td>中性粒细胞计数</td><td>4.6 ×10⁹/L（65.2%）</td><td>1.8–6.3</td><td class="tr">—</td><td class="ok">正常</td></tr>
+          <tr><td>淋巴细胞计数</td><td>1.5 ×10⁹/L（21.1%）</td><td>1.1–3.2</td><td class="tr">—</td><td class="ok">正常</td></tr>
+          <tr><td>单核细胞计数</td><td>0.6 ×10⁹/L</td><td>0.1–0.6</td><td class="tr">—</td><td class="ok">正常</td></tr>
+          <tr><td>嗜酸性粒细胞计数</td><td>0.3 ×10⁹/L</td><td>0.02–0.52</td><td class="tr">—</td><td class="ok">正常</td></tr>
+          <tr><td>NLR（中性粒÷淋巴）</td><td>3.1</td><td>—</td><td class="tr">—</td><td class="up">偏高</td></tr>
+          <tr><td>血红蛋白</td><td>126 g/L</td><td>130–175</td><td class="tr">—</td><td class="down">偏低</td></tr>
+          <tr><td>血小板计数</td><td>288 ×10⁹/L</td><td>125–350</td><td class="tr">—</td><td class="ok">正常</td></tr>
+          <tr class="grp"><td colspan="5">炎症与免疫指标</td></tr>
+          <tr><td>ESR 血沉</td><td>72 mm/h</td><td>0–15</td><td class="tr">↑ 4</td><td class="up">偏高</td></tr>
+          <tr><td>CRP C反应蛋白</td><td>52.3 mg/L</td><td>0–8</td><td class="tr">↑ 6.7</td><td class="up">偏高</td></tr>
+          <tr><td>白蛋白 ALB</td><td>36 g/L</td><td>35–55</td><td class="tr">—</td><td class="ok">正常（边缘）</td></tr>
+          <tr class="grp"><td colspan="5">纤维化相关标志物</td></tr>
+          <tr><td>KL-6</td><td>1490 U/mL</td><td>&lt;500</td><td class="tr">↑ 80</td><td class="up">偏高</td></tr>
+          <tr><td>铁蛋白</td><td>1180 ng/mL</td><td>15–300</td><td class="tr">↑ 160</td><td class="up">偏高</td></tr>
+          <tr><td>LDH 乳酸脱氢酶</td><td>540 U/L</td><td>120–250</td><td class="tr">↑ 30</td><td class="up">偏高</td></tr>
+          <tr class="grp"><td colspan="5">肺功能与血氧</td></tr>
+          <tr><td>FVC 占预计值</td><td>60%</td><td>≥80%</td><td class="tr">↓ 2%</td><td class="down">偏低</td></tr>
+          <tr><td>DLCO 占预计值</td><td>46%</td><td>≥80%</td><td class="tr">↓ 2%</td><td class="down">偏低</td></tr>
+          <tr><td>静息血氧 SpO₂</td><td>94%</td><td>≥95%</td><td class="tr">↓ 1%</td><td class="down">偏低</td></tr>
+          <tr><td>6分钟步行距离</td><td>355 米</td><td>—</td><td class="tr">↓ 15米</td><td class="down">偏低</td></tr>
+          <tr><td>步行后 SpO₂</td><td>86%</td><td>—</td><td class="tr">—</td><td class="down">偏低</td></tr>
+        </table>
+              </div>
+
+      <!-- 影像 -->
+      <div class="card" id="sec-image">
+        <h3>🫁 影像图（电子版） <span class="sub">HRCT · 2026-10-15 · 点击图片放大</span></h3>
+
+        <div class="ct-box" onclick="openCt(this)" data-title="影像图 1｜肺窗 · 网格影与牵拉性支气管扩张" data-cap="下肺层面：胸膜下见网格影及牵拉性支气管扩张，为间质性肺炎的典型表现，与本次复查影像所见一致。">
+          <img src="影像_网格影牵引支扩.png" alt="胸部CT：胸膜下网格影与牵拉性支气管扩张（脱敏）">
+        </div>
+
+        <div class="ct-cap">图1　下肺层面：胸膜下网格影、牵拉性支气管扩张（与本次复查所见一致）</div>
+
+        <div class="ct-box" onclick="openCt(this)" data-title="影像图 2｜肺窗 · 磨玻璃影" data-cap="磨玻璃影：肺野内淡雾状模糊影（图中箭头示），较前略增多，提示炎症活动。">
+          <img src="影像_磨玻璃影.png" alt="胸部CT：磨玻璃影（脱敏）">
+        </div>
+
+        <div class="ct-cap">图2　磨玻璃影（图中箭头示），较前略增多</div>
+
+        <div class="img-report">
+          <b>影像所见：</b>双肺下叶胸膜下可见网格状影及蜂窝样改变，伴牵拉性支气管扩张；双上肺散在淡薄磨玻璃影。与2026-09-23片比较：网格状影范围大致相仿，磨玻璃影略增多。<br>
+          <b>影像结论：</b>符合间质性肺炎改变，磨玻璃成分较前稍增多，请结合临床。报告医师：放射科　2026-10-15
+        </div>
+        <div style="font-size:11px;color:var(--ph);text-align:center;margin-top:8px">影像图来源：JKSR 2016;82(4):770（开放获取，已脱敏）</div>
+        <div class="sec-tip" style="margin:12px 0 0">电子版影像仅供查看。如需拷贝原始影像数据（DICOM），请联系放射科窗口。</div>
+      </div>
+
+      <!-- 报告判读 -->
+      <div class="card" id="sec-report">
+        <h3>📄 报告判读 <span class="sub">2026-10-15 · 韩茜医生已审阅</span></h3>
+
+        <div class="risk-row">
+          <span class="risk-num">35.2%</span>
+          <div>
+            <span class="badge badge-orange">中高风险</span>
+            <div class="risk-total">3个月风险｜风险总分 70（0-40低 / 41-70中 / 71-100高）</div>
+          </div>
+        </div>
+        <div class="risk-bar" style="margin-top:14px">
+          <div class="seg" style="left:0;width:41%;background:#CFE9E6"></div>
+          <div class="seg" style="left:41%;width:30%;background:#F8E3CD"></div>
+          <div class="seg" style="left:71%;width:29%;background:#F3CDCD"></div>
+          <div class="th" style="left:40%"></div>
+          <div class="mark" style="left:35.2%"></div>
+        </div>
+        <div class="risk-scale"><span>0% 低</span><span>41% 中</span><span>71% 高</span><span>100%</span></div>
+
+        <div class="plain-box" style="margin-top:14px"><b>什么意思：</b>系统评估未来3个月与疾病相关的风险为<b>35.2%，属于中高风险</b>，风险总分70已接近"高"区间的边缘（71分起）。较上次（2026-09-23，34.2%）上升1.0个百分点。需要重视，但<b>不等于病情一定会恶化</b>，请配合医生积极治疗。</div>
+
+        <h3 style="margin-top:18px">风险主要来自哪里</h3>
+        <div class="factor">
+          <div class="fh">🔺 铁蛋白近两周上升加快 <span class="badge badge-orange">推高风险</span></div>
+          <div class="fd">这次复查铁蛋白 1180（比上次上升160），而前一个月它本来是下降的。回升说明身体里的炎症/纤维化活动又活跃起来，是这次风险上升的主要原因。</div>
+        </div>
+        <div class="factor">
+          <div class="fh">🔺 KL-6 持续升高 <span class="badge badge-orange">推高风险</span></div>
+          <div class="fd">KL-6 1490（比上次上升80），从7月基线850一路升到现在。它反映肺里纤维化的活动度，数值还在涨，说明纤维化活动仍然比较活跃。</div>
+        </div>
+        <div class="factor">
+          <div class="fh">🔺 CRP、血沉偏高 <span class="badge badge-orange">推高风险</span></div>
+          <div class="fd">CRP 52.3、血沉72，都明显高于正常，提示体内有炎症反应在持续。</div>
+        </div>
+        <div class="factor">
+          <div class="fh">🔻 白蛋白保持稳定 <span class="badge badge-teal">有利因素</span></div>
+          <div class="fd">白蛋白36，一直稳定在正常范围边缘，说明营养状态还可以，是唯一在帮您"降风险"的指标。</div>
+        </div>
+
+        <div class="modal-bar">
+          <div class="mlbl"><span>影像变化（影像组学）</span><span>42%</span></div>
+          <div class="mtrack"><div class="mfill" style="width:84%;background:var(--primary)"></div></div>
+        </div>
+        <div class="modal-bar">
+          <div class="mlbl"><span>血液指标（蛋白组学）</span><span>33%</span></div>
+          <div class="mtrack"><div class="mfill" style="width:66%;background:var(--teal)"></div></div>
+        </div>
+        <div class="modal-bar" style="margin-bottom:14px">
+          <div class="mlbl"><span>临床资料（年龄、病史等）</span><span>25%</span></div>
+          <div class="mtrack"><div class="mfill" style="width:50%;background:var(--orange)"></div></div>
+        </div>
+
+        <div class="find-card"><b>关键发现：</b>KL-6仍在上升，铁蛋白这次由降转升，提示肺纤维化活动仍然较活跃；风险总分70已接近"高"区间，要特别重视。</div>
+        <div class="advice-card"><b>医生建议：</b>① 2周内（10-29前）复查KL-6、铁蛋白、血常规；② 继续按现方案治疗，不要自行停药；③ 出现气促明显加重、发热、咳痰增多或静息血氧低于92%，立即联系医生或急诊；④ 低强度活动量力而行，避免劳累和粉尘环境。</div>
+        <div class="report-foot">本报告仅供临床研究使用，分析结果不作为临床诊断依据｜报告由韩茜副主任医师审阅 · 2026-10-16</div>
+      </div>
+
+    </section>
+
+    <!-- ============ 指标解读 ============ -->
+    <section id="page-explain" class="page hidden">
+
+      <div class="sec-tip">本页只做简要科普，具体治疗请遵医嘱。</div>
+
+      <div class="group-title"><span class="gl"></span>纤维化与炎症标志</div>
+
+      <div class="ind-card">
+        <div class="ih"><b>KL-6（涎液化糖链抗原）</b><span class="val up">1490 U/mL 偏高</span></div>
+        <div class="ir">参考范围：&lt;500 U/mL<b>｜</b>较上次 ↑80</div>
+        <div class="il"><span class="lb">是什么</span>肺里纤维化活动度的"温度计"，肺泡受损时释放到血液里，是间质性肺病专用的监测指标。</div>
+        <div class="il"><span class="lb">你的情况</span>1490，明显高于正常，且从7月基线850一路升到现在。</div>
+        <div class="plain">💡 数值还在涨＝肺纤维化活动仍然比较活跃，是医生最关注的指标，下次复查重点看它的趋势。</div>
+      </div>
+
+      <div class="ind-card">
+        <div class="ih"><b>铁蛋白</b><span class="val up">1180 ng/mL 偏高</span></div>
+        <div class="ir">参考范围：15–300 ng/mL<b>｜</b>较上次 ↑160</div>
+        <div class="il"><span class="lb">是什么</span>身体里储存铁、也反映炎症的蛋白。炎症或纤维化活动时，铁蛋白会升高。</div>
+        <div class="il"><span class="lb">你的情况</span>1180，偏高。上个月本来是下降的，这次回升了160。</div>
+        <div class="plain">💡 由降转升是这次风险上升的主要原因，说明炎症/纤维化活动又活跃起来，需要按医生安排复查。</div>
+      </div>
+
+      <div class="ind-card">
+        <div class="ih"><b>CRP（C反应蛋白）</b><span class="val up">52.3 mg/L 偏高</span></div>
+        <div class="ir">参考范围：0–8 mg/L<b>｜</b>较上次 ↑6.7</div>
+        <div class="il"><span class="lb">是什么</span>体内炎症的"快指标"，炎症一起来它很快升高，炎症退了它也降得快。</div>
+        <div class="il"><span class="lb">你的情况</span>52.3，明显高于正常。</div>
+        <div class="plain">💡 说明体内有炎症反应在持续，医生会结合其他指标一起判断要不要调整治疗。</div>
+      </div>
+
+      <div class="ind-card">
+        <div class="ih"><b>ESR（血沉）</b><span class="val up">72 mm/h 偏高</span></div>
+        <div class="ir">参考范围：0–15 mm/h<b>｜</b>较上次 ↑4</div>
+        <div class="il"><span class="lb">是什么</span>体内炎症的"慢指标"，变化比CRP慢，适合看炎症的长期趋势。</div>
+        <div class="il"><span class="lb">你的情况</span>72，明显偏高。</div>
+        <div class="plain">💡 和CRP一样提示炎症持续，单个数值不用过度紧张，重点是看它有没有继续往上涨。</div>
+      </div>
+
+      <div class="group-title"><span class="gl"></span>血液细胞</div>
+
+      <div class="ind-card">
+        <div class="ih"><b>白细胞 / 中性粒细胞</b><span class="val ok">7.1 / 4.6 正常</span></div>
+        <div class="ir">参考范围：3.5–9.5 / 1.8–6.3 ×10⁹/L</div>
+        <div class="il"><span class="lb">是什么</span>白细胞是身体免疫的主力军，中性粒细胞是打"急性炎症仗"的主力。</div>
+        <div class="il"><span class="lb">你的情况</span>都在正常范围。</div>
+        <div class="plain">💡 说明目前没有明显的急性感染，是好消息。</div>
+      </div>
+
+      <div class="ind-card">
+        <div class="ih"><b>NLR（中性粒÷淋巴比值）</b><span class="val up">3.1 偏高</span></div>
+        <div class="ir">参考范围：一般 &lt;2.5</div>
+        <div class="il"><span class="lb">是什么</span>用中性粒细胞数除以淋巴细胞数，是近年常用的炎症反应指标。</div>
+        <div class="il"><span class="lb">你的情况</span>3.1，略高于2.5。</div>
+        <div class="plain">💡 提示体内炎症反应偏活跃，是医生评估风险时的参考指标之一，不用单独处理。</div>
+      </div>
+
+      <div class="ind-card">
+        <div class="ih"><b>血红蛋白（Hb）</b><span class="val down">126 g/L 偏低</span></div>
+        <div class="ir">参考范围：130–175 g/L</div>
+        <div class="il"><span class="lb">是什么</span>红细胞里负责运输氧气的"搬运工"，低了就是大家常说的贫血。</div>
+        <div class="il"><span class="lb">你的情况</span>126，轻度偏低。</div>
+        <div class="plain">💡 轻度贫血可能让你更容易累、更容易气促。平时多吃鱼、蛋、瘦肉，贫血加重要告诉医生。</div>
+      </div>
+
+      <div class="ind-card">
+        <div class="ih"><b>血小板 / 白蛋白（ALB）</b><span class="val ok">288 / 36 正常</span></div>
+        <div class="ir">参考范围：125–350 ×10⁹/L<b>｜</b>35–55 g/L</div>
+        <div class="il"><span class="lb">是什么</span>血小板管止血；白蛋白反映营养状态，太低说明营养跟不上。</div>
+        <div class="il"><span class="lb">你的情况</span>都正常，白蛋白在正常下缘。</div>
+        <div class="plain">💡 白蛋白稳定说明营养还可以，注意保持体重，别让它继续掉。</div>
+      </div>
+
+      <div class="group-title"><span class="gl"></span>肺功能与血氧</div>
+
+      <div class="ind-card">
+        <div class="ih"><b>FVC（用力肺活量）</b><span class="val down">60% 偏低</span></div>
+        <div class="ir">参考范围：≥80% 占预计值<b>｜</b>较上次 ↓2%</div>
+        <div class="il"><span class="lb">是什么</span>肺能装多少气。肺纤维化会让肺变"硬"、变小，FVC就会下降。</div>
+        <div class="il"><span class="lb">你的情况</span>60%，比上次下降2%。</div>
+        <div class="plain">💡 下降说明肺容量还在缓慢变小，是医生判断病情进展的重要指标，按时复查肺功能很重要。</div>
+      </div>
+
+      <div class="ind-card">
+        <div class="ih"><b>DLCO（弥散功能）</b><span class="val down">46% 偏低</span></div>
+        <div class="ir">参考范围：≥80% 占预计值<b>｜</b>较上次 ↓2%</div>
+        <div class="il"><span class="lb">是什么</span>氧气从肺进到血液里的效率，是间质性肺病里最敏感的指标之一。</div>
+        <div class="il"><span class="lb">你的情况</span>46%，偏低，比上次下降2%。</div>
+        <div class="plain">💡 偏低就是"换气效率下降"，这正是活动后气促的原因。数值继续下降要及时告诉医生。</div>
+      </div>
+
+      <div class="ind-card">
+        <div class="ih"><b>血氧饱和度（SpO₂）</b><span class="val down">静息94% 偏低</span></div>
+        <div class="ir">参考范围：静息 ≥95%<b>｜</b>步行后 86%</div>
+        <div class="il"><span class="lb">是什么</span>血液里氧气的"满度"，用指夹血氧仪夹手指就能测。</div>
+        <div class="il"><span class="lb">你的情况</span>静息94%，活动后86%，都偏低。</div>
+        <div class="plain">💡 家里备一个指夹血氧仪，每天测一次。<b>静息低于92%或活动后低于85%，马上联系医生</b>；低于90%直接急诊。</div>
+      </div>
+
+      <div class="ind-card">
+        <div class="ih"><b>6分钟步行试验</b><span class="val down">355米 偏低</span></div>
+        <div class="ir">较上次：↓15米<b>｜</b>步行后SpO₂ 86%</div>
+        <div class="il"><span class="lb">是什么</span>6分钟尽力能走多远，综合反映心肺功能和日常活动能力。</div>
+        <div class="il"><span class="lb">你的情况</span>355米，比上次少15米，走完血氧掉到86%。</div>
+        <div class="plain">💡 能走多远直接反映日常活动能力。距离变短要重视，平时活动以"不喘到说不出话"为度。</div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <h3>👩‍⚕️ 医生建议（本次复查）</h3>
+        <ul class="note-list">
+          <li><span class="ni">1</span><div><b>2周内复查</b>（2026-10-29前）：抽血查KL-6、铁蛋白、血常规，重点看趋势。</div></li>
+          <li><span class="ni">2</span><div><b>规律治疗</b>：按现方案用药，激素等药物需遵医嘱调整，<b>不可自行停药或加减</b>；用药期间按医生要求定期查肝功能、血常规。</div></li>
+          <li><span class="ni">3</span><div><b>就医信号</b>：气促明显加重、发热、咳痰增多、胸痛咯血，或静息血氧低于92%，立即联系医生或到急诊。</div></li>
+          <li><span class="ni">4</span><div><b>活动</b>：散步、缩唇呼吸等低强度锻炼，量力而行；避免劳累、粉尘和油烟环境。</div></li>
+          <li><span class="ni">5</span><div><b>疫苗</b>：流感疫苗、肺炎疫苗按时接种（接种前先问医生）。</div></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>📌 平时注意事项</h3>
+        <ul class="note-list">
+          <li><span class="ni">🦠</span><div><b>预防感染</b>：感染是病情加重最常见的诱因。勤洗手、戴口罩，少去人多密闭的场所，流感/肺炎疫苗按时打（先问医生）。</div></li>
+          <li><span class="ni">🚭</span><div><b>远离烟雾粉尘</b>：自己不吸烟，避开二手烟、厨房油烟、装修粉尘和刺激性气体，家里保持通风。</div></li>
+          <li><span class="ni">🏃</span><div><b>活动</b>：每天散步20-30分钟，配合缩唇呼吸（鼻子吸气2秒、嘴唇像吹蜡烛一样慢慢呼气4秒）；气促就停下休息，外出随身带血氧仪。</div></li>
+          <li><span class="ni">🍚</span><div><b>饮食</b>：高蛋白（鱼、蛋、奶、瘦肉），少食多餐；<b>体重1个月下降超过2公斤要告诉医生</b>。</div></li>
+          <li><span class="ni">💊</span><div><b>用药</b>：按时按量，设置闹钟提醒；不要自己停药、减量，特别是激素类药物。</div></li>
+          <li><span class="ni">😴</span><div><b>睡眠与情绪</b>：保证休息；焦虑、睡不好要讲出来，可以找医生或心理支持，不要自己扛。</div></li>
+          <li><span class="ni">📝</span><div><b>随访打卡</b>：每周在「随访上报」记录一次感受和血氧，医生能及时看到变化。</div></li>
+        </ul>
+      </div>
+
+    </section>
+
+    <!-- ============ 随访上报 ============ -->
+    <section id="page-follow" class="page hidden">
+
+      <div class="card">
+        <h3>😊 这周感觉怎么样？</h3>
+        <div class="sec-tip">点一下选中，可多选。选了<b>气促</b>，医生会优先看到并尽快联系您。</div>
+        <div id="symptom-chips">
+          <span class="chip" onclick="this.classList.toggle('on')">气促</span>
+          <span class="chip" onclick="this.classList.toggle('on')">咳嗽</span>
+          <span class="chip" onclick="this.classList.toggle('on')">咳痰</span>
+          <span class="chip" onclick="this.classList.toggle('on')">发热</span>
+          <span class="chip" onclick="this.classList.toggle('on')">乏力</span>
+          <span class="chip" onclick="this.classList.toggle('on')">关节痛</span>
+          <span class="chip" onclick="this.classList.toggle('on')">皮疹</span>
+          <span class="chip" onclick="this.classList.toggle('on')">食欲差</span>
+          <span class="chip" onclick="this.classList.toggle('on')">睡眠差</span>
+          <span class="chip" onclick="this.classList.toggle('on')">没有不舒服</span>
+        </div>
+
+        <div class="slider-row" style="margin-top:14px">
+          <div class="sl-h"><b>气促程度</b><span class="sv" id="sv-dysp">0 没有</span></div>
+          <input type="range" min="0" max="5" value="0" oninput="updSlider('dysp',this.value)">
+          <div class="sl-scale"><span>没有</span><span>轻微</span><span>中度</span><span>很重</span></div>
+        </div>
+        <div class="slider-row">
+          <div class="sl-h"><b>咳嗽程度</b><span class="sv" id="sv-cough">0 没有</span></div>
+          <input type="range" min="0" max="5" value="0" oninput="updSlider('cough',this.value)">
+          <div class="sl-scale"><span>没有</span><span>轻微</span><span>中度</span><span>很重</span></div>
+        </div>
+        <div class="slider-row">
+          <div class="sl-h"><b>乏力程度</b><span class="sv" id="sv-fat">0 没有</span></div>
+          <input type="range" min="0" max="5" value="0" oninput="updSlider('fat',this.value)">
+          <div class="sl-scale"><span>没有</span><span>轻微</span><span>中度</span><span>很重</span></div>
+        </div>
+
+        <div class="field">
+          <label>静息血氧（%）<small>安静坐着测2分钟</small></label>
+          <input id="in-spo" placeholder="例如 94" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label>体温（℃）<small>选填</small></label>
+          <input id="in-temp" placeholder="例如 36.5" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label>体重（kg）<small>选填</small></label>
+          <input id="in-wt" placeholder="例如 65.0" inputmode="decimal">
+        </div>
+
+        <label style="display:block;font-size:15px;font-weight:700;margin-bottom:8px">用一句话描述最近的状态<small style="font-weight:400;color:var(--gray);font-size:12.5px;margin-left:8px">选填</small></label>
+        <textarea id="in-desc" placeholder="例如：这周爬两层楼就喘，晚上有点咳嗽，精神还行。"></textarea>
+      </div>
+
+      <div class="card">
+        <h3>📷 上传照片</h3>
+        <div class="sec-tip">可以拍：最近一次的<b>CT胶片、化验单、皮疹照片</b>。拍CT胶片请贴在窗户玻璃上、不开闪光灯、四角拍全。</div>
+        <button class="big-btn ghost" onclick="document.getElementById('cam-in').click()">📷 拍摄照片</button>
+        <input type="file" id="cam-in" accept="image/*" capture="environment" style="display:none" onchange="addPhoto(this)">
+        <button class="big-btn ghost" onclick="document.getElementById('gal-in').click()">🖼 从相册 / 电脑选择</button>
+        <input type="file" id="gal-in" accept="image/*" multiple style="display:none" onchange="addPhoto(this)">
+        <div class="preview-grid" id="pv-grid">
+          <div class="pv-hint" id="pv-hint">还没有照片，拍好后会显示在这里</div>
+        </div>
+        <div class="sec-tip" style="margin:10px 0 0">演示版：照片只在本地预览，正式版会直接发送给医生。</div>
+      </div>
+
+      <div class="card">
+        <h3>💊 今天吃药了吗？</h3>
+        <div id="med-chips">
+          <span class="chip" onclick="pickMed(this)">吃了，按医生说的量</span>
+          <span class="chip" onclick="pickMed(this)">吃了，但漏了一顿</span>
+          <span class="chip" onclick="pickMed(this)">没吃</span>
+        </div>
+      </div>
+
+      <button class="big-btn" onclick="submitFollow()">提交给医生 ➜</button>
+      <div class="sec-tip" style="margin-top:12px">每周至少提交1次。提交后韩茜医生会在医生端看到，指标有异常会主动联系您。</div>
+
+      <div class="card">
+        <h3>📤 历史提交</h3>
+        <div id="his-list">
+          <div class="his-item">
+            <div class="hd"><b>2026-10-08 影像与指标</b><div>提交时间 10-08 14:32｜血氧、体温、体重及CT胶片照片</div></div>
+            <span class="ha"><span class="badge badge-teal">医生已查看</span></span>
+          </div>
+          <div class="his-item">
+            <div class="hd"><b>2026-09-23 随访数据</b><div>提交时间 09-23 10:05｜气促1分、咳嗽1分，其余正常</div></div>
+            <span class="ha"><span class="badge badge-teal">医生已查看</span></span>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <h3>📋 今日任务</h3>
-        <div class="task">
-          <span class="tn">1</span>
-          <div class="tt">拍摄CT胶片照片<small>把最近一次复查的CT胶片拍清楚，上传给医生</small></div>
-          <span class="ta"><button class="big-btn ghost" style="margin:0;padding:8px 18px;font-size:14px" onclick="startRecord()">去完成</button></span>
-        </div>
-        <div class="task">
-          <span class="tn">2</span>
-          <div class="tt">录入本周指标<small>血氧、体温、体重，以及最近的化验结果</small></div>
-          <span class="ta"><button class="big-btn ghost" style="margin:0;padding:8px 18px;font-size:14px" onclick="startRecord()">去完成</button></span>
-        </div>
-        <div class="sec-tip" style="margin:12px 0 0">💡 点击「去完成」进入录入页，按页面指引一步步操作，全程不超过10分钟。</div>
-      </div>
-
-      <div class="card">
-        <h3>📤 上次提交</h3>
-        <div class="task" style="border:none;padding:4px 0">
-          <span class="tn" style="background:var(--teal)">✓</span>
-          <div class="tt">2026-10-08 提交的影像与指标<small>提交时间 10-08 14:32</small></div>
-          <span class="ta"><span class="done-chip">医生已查看</span></span>
-        </div>
-        <div class="task" style="border:none;padding:4px 0">
-          <span class="tn" style="background:var(--teal)">✓</span>
-          <div class="tt">2026-09-23 提交的随访数据<small>提交时间 09-23 10:05</small></div>
-          <span class="ta"><span class="done-chip">医生已查看</span></span>
-        </div>
+        <h3>⏰ 下次复查提醒</h3>
+        <ul class="note-list">
+          <li><span class="ni">🗓</span><div><b>2026-10-29（周四）· 还有8天</b>　空腹抽血：KL-6、铁蛋白、血常规；复查肺功能</div></li>
+          <li><span class="ni">📂</span><div>带齐：既往化验单、CT报告、正在吃的药单</div></li>
+        </ul>
       </div>
 
     </section>
 
-    <!-- ============ 录入 ============ -->
-    <section id="page-record" class="page hidden">
-
-      <!-- 第1步 拍摄影像 -->
-      <div id="rec-step1">
-        <div class="card">
-          <h3>第 1 步：拍摄CT胶片</h3>
-          <button class="big-btn" onclick="document.getElementById('cam-in').click()">
-            <span class="bi">📷</span>拍摄CT胶片
-            <small>点这里直接调用手机相机拍照（手机上操作）</small>
-          </button>
-          <input type="file" id="cam-in" accept="image/*" capture="environment" style="display:none" onchange="addPhoto(this)">
-          <button class="big-btn ghost" onclick="document.getElementById('gal-in').click()">🖼 从相册 / 电脑选择已拍好的照片</button>
-          <input type="file" id="gal-in" accept="image/*" multiple style="display:none" onchange="addPhoto(this)">
-          <div class="preview-grid" id="pv-grid">
-            <div class="pv-hint" id="pv-hint">还没有照片，拍好后会显示在这里</div>
-          </div>
-        </div>
-
-        <div class="card" style="background:var(--light);border-color:transparent">
-          <h3>🪟 拍照前，请先看清楚这3条</h3>
-          <div class="guide-step"><span class="gn">1</span><div class="gt">把CT胶片<b>贴在窗户玻璃或灯箱上</b>，让光从背面透过胶片。</div></div>
-          <div class="guide-step"><span class="gn">2</span><div class="gt">手机<b>正对胶片，四角都要拍全</b>，一张一张拍，不要一次拍整张大的。</div></div>
-          <div class="guide-step"><span class="gn">3</span><div class="gt"><b>不要开闪光灯</b>，每张照片保持清晰，拍完检查没有反光和模糊。</div></div>
-        </div>
-
-        <button class="big-btn solid" id="st1-btn" onclick="nextRecord(2)">照片拍好了，下一步 ➜</button>
-      </div>
-
-      <!-- 第2步 输入指标 -->
-      <div id="rec-step2" class="hidden">
-        <div class="card">
-          <h3>第 2 步：录入本周指标</h3>
-          <div class="field">
-            <label>血氧饱和度<small>用家用指夹血氧仪测，安静坐着测2分钟</small></label>
-            <input id="in-spo" placeholder="例如 95" inputmode="decimal">
-            <div class="unit">单位：%　｜　从哪里看：指夹血氧仪屏幕上的 SpO₂ 数字</div>
-          </div>
-          <div class="field">
-            <label>体温<small>休息10分钟后测</small></label>
-            <input id="in-temp" placeholder="例如 36.5" inputmode="decimal">
-            <div class="unit">单位：℃　｜　从哪里看：体温计读数</div>
-          </div>
-          <div class="field">
-            <label>体重<small>每天清晨、排空后、穿同样衣服称</small></label>
-            <input id="in-wt" placeholder="例如 65.0" inputmode="decimal">
-            <div class="unit">单位：kg　｜　从哪里看：体重秤读数</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>这周有哪些不舒服？（点一下选中，可多选）</h3>
-          <div id="symptom-chips">
-            <span class="chip" onclick="this.classList.toggle('on')">咳嗽</span>
-            <span class="chip" onclick="this.classList.toggle('on')">气促</span>
-            <span class="chip" onclick="this.classList.toggle('on')">发热</span>
-            <span class="chip" onclick="this.classList.toggle('on')">关节痛</span>
-            <span class="chip" onclick="this.classList.toggle('on')">皮疹</span>
-            <span class="chip" onclick="this.classList.toggle('on')">没有不舒服</span>
-          </div>
-          <div class="sec-tip" style="margin:8px 0 0">⚠️ 如果选了<b>气促</b>，医生会优先看到并尽快联系您。</div>
-        </div>
-
-        <div class="card">
-          <h3>最近查血了吗？（没有可跳过，直接点下一步）</h3>
-          <div class="sec-tip">📄 化验单上找到对应的<b>项目名称</b>，照着填数字就行。找不到的可以不填。</div>
-          <div class="field">
-            <label>KL-6<small>化验单项目名：涎液化糖链抗原 / KL-6</small></label>
-            <input id="in-kl6" placeholder="例如 1410" inputmode="decimal">
-            <div class="unit">单位：U/mL</div>
-          </div>
-          <div class="field">
-            <label>铁蛋白<small>化验单项目名：铁蛋白 / Ferritin</small></label>
-            <input id="in-fer" placeholder="例如 1020" inputmode="decimal">
-            <div class="unit">单位：ng/mL</div>
-          </div>
-          <div class="field">
-            <label>LDH<small>化验单项目名：乳酸脱氢酶 / LDH</small></label>
-            <input id="in-ldh" placeholder="例如 510" inputmode="decimal">
-            <div class="unit">单位：U/L</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>💊 今天吃药了吗？</h3>
-          <div id="med-chips">
-            <span class="chip" onclick="pickMed(this)">吃了，按医生说的量</span>
-            <span class="chip" onclick="pickMed(this)">吃了，但漏了一顿</span>
-            <span class="chip" onclick="pickMed(this)">没吃</span>
-          </div>
-        </div>
-
-        <button class="big-btn solid" id="st2-btn" onclick="nextRecord(3)">填写完成，提交给医生 ➜</button>
-      </div>
-
-      <!-- 第3步 成功 -->
-      <div id="rec-step3" class="hidden">
-        <div class="success">
-          <div class="si">✓</div>
-          <h2>已成功提交</h2>
-          <div class="st">您的影像和指标已发送给韩茜医生。<br>医生查看后，您会在这里收到消息。<br>如果指标有异常，医生会主动联系您，请保持电话畅通。</div>
-          <button class="big-btn ghost" onclick="backHome()">返回首页</button>
-        </div>
-      </div>
-
-    </section>
   </div>
 
   <nav class="bottom-nav">
-    <div class="bn active" id="bn-home" onclick="goTab('home')"><span class="bi">🏠</span>首页</div>
-    <div class="bn" id="bn-record" onclick="goTab('record')"><span class="bi">📝</span>录入</div>
+    <div class="bn active" id="bn-overview" onclick="goTab('overview')"><span class="bi">🏠</span>复查总览</div>
+    <div class="bn" id="bn-results" onclick="goTab('results')"><span class="bi">📋</span>检查结果</div>
+    <div class="bn" id="bn-explain" onclick="goTab('explain')"><span class="bi">💡</span>指标解读</div>
+    <div class="bn" id="bn-follow" onclick="goTab('follow')"><span class="bi">📝</span>随访上报</div>
   </nav>
 
-  <div id="submit-holder"></div>
+  <div class="foot-note" style="padding-bottom:130px">本系统仅供临床研究使用，分析结果不作为临床诊断依据<br>源肺悉踪 · 多模态融合模型 v2.1（在研试用）</div>
+</div>
+
+<div class="modal-mask hidden" id="ct-mask">
+  <div class="modal-box">
+    <div class="mt"><span id="ct-title">影像图</span><button class="mx" onclick="closeCt()">✕</button></div>
+    <div id="ct-body"></div>
+    <div class="mc" id="ct-cap"></div>
+  </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
+/* ---------- 数据 ---------- */
+var VISITS = [
+  {d:'2026-07-10', n:'第1次（基线）', kl:850,  fe:1200, ld:380, risk:21.5, total:43},
+  {d:'2026-07-24', n:'第2次',        kl:920,  fe:980,  ld:360, risk:18.2, total:36},
+  {d:'2026-08-07', n:'第3次',        kl:1080, fe:760,  ld:420, risk:23.4, total:47},
+  {d:'2026-08-21', n:'第4次',        kl:1260, fe:880,  ld:465, risk:30.5, total:61},
+  {d:'2026-09-23', n:'第5次',        kl:1410, fe:1020, ld:510, risk:34.2, total:68},
+  {d:'2026-10-15', n:'第6次（本次）', kl:1490, fe:1180, ld:540, risk:35.2, total:70}
+];
+var LATEST_KPI = [
+  ['KL-6','1490','up','red'],['铁蛋白','1180','up','red'],['LDH','540','up','red'],
+  ['ESR','72','up','orange'],['CRP','52.3','up','orange'],
+  ['FVC','60%','down','orange'],['DLCO','46%','down','orange'],
+  ['SpO₂','94%','down','orange'],['6分钟步行','355米','down','orange']
+];
+var SLIDER_TXT = ['没有','很轻微','轻微','中等','比较重','很重'];
 var photos = [];
 
+/* ---------- 通用 ---------- */
 function toast(msg){
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -301,51 +693,75 @@ function toast(msg){
   t._h = setTimeout(function(){ t.classList.remove('show'); }, 2400);
 }
 function goTab(name){
-  document.getElementById('page-home').classList.toggle('hidden', name !== 'home');
-  document.getElementById('page-record').classList.toggle('hidden', name !== 'record');
-  document.getElementById('bn-home').classList.toggle('active', name === 'home');
-  document.getElementById('bn-record').classList.toggle('active', name === 'record');
+  ['overview','results','explain','follow'].forEach(function(n){
+    document.getElementById('page-' + n).classList.toggle('hidden', n !== name);
+    document.getElementById('bn-' + n).classList.toggle('active', n === name);
+  });
   window.scrollTo(0,0);
 }
-function startRecord(){
-  goTab('record');
-  showRecStep(1);
+function goResults(sub){
+  goTab('results');
+  document.getElementById('sec-' + sub).scrollIntoView({behavior:'smooth', block:'start'});
 }
-function showRecStep(n){
-  document.getElementById('rec-step1').classList.toggle('hidden', n !== 1);
-  document.getElementById('rec-step2').classList.toggle('hidden', n !== 2);
-  document.getElementById('rec-step3').classList.toggle('hidden', n !== 3);
-  window.scrollTo(0,0);
+function levelBadge(total){
+  if(total <= 40) return '<span id="risk-badge" class="badge badge-teal">低风险</span>';
+  if(total <= 70) return '<span id="risk-badge" class="badge badge-orange">中高风险</span>';
+  return '<span id="risk-badge" class="badge badge-red">高风险</span>';
 }
-function nextRecord(n){
-  if(n === 2){
-    if(photos.length === 0){ toast('请先拍摄或选择至少1张CT胶片照片'); return; }
-    showRecStep(2);
-  } else if(n === 3){
-    var spo = document.getElementById('in-spo').value.trim();
-    if(!spo){ toast('请填写血氧饱和度，这是最重要的指标'); return; }
-    showRecStep(3);
+
+/* ---------- 复查切换 ---------- */
+function renderVisitChips(){
+  var box = document.getElementById('visit-chips');
+  box.innerHTML = VISITS.map(function(v,i){
+    return '<span class="vchip' + (i === 5 ? ' on' : '') + '" onclick="selectVisit(' + i + ')">' + v.d.slice(5) + '</span>';
+  }).join('');
+}
+function selectVisit(i){
+  var v = VISITS[i];
+  document.querySelectorAll('#visit-chips .vchip').forEach(function(c,k){ c.classList.toggle('on', k === i); });
+  document.getElementById('v-date').textContent = v.d + ' 复查';
+  document.getElementById('v-info').innerHTML = v.n + '｜呼吸与危重症医学科｜主诊医生：韩茜 副主任医师<br>诊断：抗MDA5阳性皮肌炎相关间质性肺病（DM-ILD）';
+  document.getElementById('risk-num').textContent = v.risk + '%';
+  document.getElementById('risk-total').textContent = '风险总分 ' + v.total + '（0-40低 / 41-70中 / 71-100高）';
+  document.getElementById('risk-badge').outerHTML = levelBadge(v.total);
+  document.getElementById('risk-mark').style.left = Math.min(v.risk, 99) + '%';
+  var d = document.getElementById('risk-delta');
+  if(i === 0){
+    d.textContent = '首次评估（基线）';
+    d.classList.add('good');
+  } else {
+    var diff = v.risk - VISITS[i-1].risk;
+    var up = diff >= 0;
+    d.textContent = '较上次复查（' + VISITS[i-1].d.slice(5) + '）' + (up ? ' ↑ ' : ' ↓ ') + Math.abs(diff).toFixed(1) + ' 个百分点';
+    d.classList.toggle('good', !up);
+  }
+  var grid = document.getElementById('kpi-grid');
+  if(i === 5){
+    grid.innerHTML = LATEST_KPI.map(function(k){
+      return '<div class="kpi"><div class="kn">' + k[0] + '</div><div class="kv ' + k[2] + '">' + k[1] + (k[2] === 'up' ? '↑' : '↓') + '</div></div>';
+    }).join('');
+  } else {
+    grid.innerHTML = [
+      ['KL-6', v.kl + ' U/mL', 'up'],['铁蛋白', v.fe + ' ng/mL', 'up'],['LDH', v.ld + ' U/L', 'up']
+    ].map(function(k){
+      return '<div class="kpi"><div class="kn">' + k[0] + '</div><div class="kv ' + k[2] + '">' + k[1] + '↑</div></div>';
+    }).join('') + '<div style="grid-column:1/-1;font-size:12px;color:var(--ph);text-align:center;padding:6px 0">该次复查的完整化验结果未留存，仅显示关键指标</div>';
   }
 }
-function backHome(){
-  goTab('home');
-  resetRecord();
+
+/* ---------- 随访 ---------- */
+function updSlider(name, val){
+  document.getElementById('sv-' + name).textContent = val + ' ' + SLIDER_TXT[val];
 }
-function resetRecord(){
-  photos = [];
-  document.getElementById('pv-grid').innerHTML = '<div class="pv-hint" id="pv-hint">还没有照片，拍好后会显示在这里</div>';
-  ['in-spo','in-temp','in-wt','in-kl6','in-fer','in-ldh'].forEach(function(id){
-    document.getElementById(id).value = '';
-  });
-  document.querySelectorAll('#symptom-chips .chip,#med-chips .chip').forEach(function(c){ c.classList.remove('on'); });
-  showRecStep(1);
+function pickMed(el){
+  document.querySelectorAll('#med-chips .chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on');
 }
 function addPhoto(inp){
   var ok = 0;
-  for(var i=0;i<inp.files.length;i++){
+  for(var i = 0; i < inp.files.length; i++){
     if(photos.length >= 9){ toast('最多上传9张照片，多余的没有保存'); break; }
-    var url = URL.createObjectURL(inp.files[i]);
-    photos.push(url);
+    photos.push(URL.createObjectURL(inp.files[i]));
     ok++;
   }
   inp.value = '';
@@ -353,20 +769,55 @@ function addPhoto(inp){
 }
 function renderPhotos(){
   var grid = document.getElementById('pv-grid');
-  var html = photos.map(function(u,i){
-    return '<div class="pv"><img src="'+u+'" alt="胶片照片"><button class="del" onclick="delPhoto('+i+')">✕</button></div>';
-  }).join('');
-  grid.innerHTML = html + '<div class="pv-hint">共 ' + photos.length + ' 张｜点照片右上角 ✕ 可以删除重拍</div>';
+  grid.innerHTML = photos.map(function(u,i){
+    return '<div class="pv"><img src="' + u + '" alt="上传照片"><button class="del" onclick="delPhoto(' + i + ')">✕</button></div>';
+  }).join('') + '<div class="pv-hint">共 ' + photos.length + ' 张｜点右上角 ✕ 删除</div>';
 }
 function delPhoto(i){
   photos.splice(i,1);
   renderPhotos();
-  if(photos.length === 0) toast('照片已清空，请重新拍摄');
+  if(photos.length === 0) toast('照片已清空');
 }
-function pickMed(el){
-  document.querySelectorAll('#med-chips .chip').forEach(function(c){ c.classList.remove('on'); });
-  el.classList.add('on');
+function submitFollow(){
+  var spo = document.getElementById('in-spo').value.trim();
+  if(!spo){ toast('请先填写静息血氧，这是最重要的指标'); return; }
+  var med = document.querySelector('#med-chips .chip.on');
+  if(!med){ toast('请选择今天是否服药'); return; }
+  var syms = [];
+  document.querySelectorAll('#symptom-chips .chip.on').forEach(function(c){ syms.push(c.textContent); });
+  var dysp = document.getElementById('sv-dysp').textContent.split(' ')[0];
+  var desc = document.getElementById('in-desc').value.trim();
+  var symTxt = syms.length ? syms.join('、') : '无不适';
+  var summary = '气促' + dysp + '分、咳嗽' + document.getElementById('sv-cough').textContent.split(' ')[0] + '分、乏力' + document.getElementById('sv-fat').textContent.split(' ')[0] + '分' + (desc ? '；留言：' + desc.slice(0, 24) + (desc.length > 24 ? '…' : '') : '') + '｜' + symTxt;
+  var html = '<div class="his-item"><div class="hd"><b>2026-10-21 感受与指标（刚刚提交）</b><div>血氧 ' + spo + '%　' + summary + '</div></div><span class="ha"><span class="badge badge-orange">等待医生查看</span></span></div>';
+  document.getElementById('his-list').insertAdjacentHTML('afterbegin', html);
+  photos = [];
+  document.getElementById('pv-grid').innerHTML = '<div class="pv-hint" id="pv-hint">还没有照片，拍好后会显示在这里</div>';
+  document.getElementById('in-spo').value = '';
+  document.getElementById('in-temp').value = '';
+  document.getElementById('in-wt').value = '';
+  document.getElementById('in-desc').value = '';
+  document.querySelectorAll('#symptom-chips .chip,#med-chips .chip').forEach(function(c){ c.classList.remove('on'); });
+  toast('已提交，韩茜医生会收到提醒（演示）');
+  window.scrollTo(0,0);
 }
+
+/* ---------- 影像放大 ---------- */
+function openCt(el){
+  document.getElementById('ct-title').textContent = el.getAttribute('data-title');
+  document.getElementById('ct-cap').textContent = el.getAttribute('data-cap');
+  document.getElementById('ct-body').innerHTML = el.querySelector('img').outerHTML;
+  document.getElementById('ct-mask').classList.remove('hidden');
+}
+function closeCt(){
+  document.getElementById('ct-mask').classList.add('hidden');
+}
+document.getElementById('ct-mask').addEventListener('click', function(e){ if(e.target === this) closeCt(); });
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCt(); });
+
+/* ---------- 初始化 ---------- */
+renderVisitChips();
+selectVisit(5);
 </script>
 </body>
 </html>
